@@ -1,0 +1,8 @@
+*.bas text eol=lf
+*.py text eol=lf
+*.md text eol=lf
+# RISC OS files are binary, apart from Obey and Text files
+app/** -text -diff
+app/**/*,feb text eol=lf diff
+app/**/*,fff text eol=lf diff
+reference/** binary

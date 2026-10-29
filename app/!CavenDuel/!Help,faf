@@ -1,0 +1,427 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Cavern Duel</title></head>
+
+<body>
+<h2>Cavern Duel</h2>
+<p>Version 1.271 (26th February, 2011) </p>
+<p>By Graeme and Stephen Scott &copy; 1994-2011. <br />
+  WIMP front end by <a href="http://www.rayfavre.me.uk/drwimp.html" target="_blank">Dr Wimp 4.70</a>.</p>
+  <p>This game is dedicated to Mary Scott (1944 - 2010), who always enjoyed playing JCB Digger, Spectapede, Strike Force Harrier, and many other games, too numerous to mention. A wonderful mum, sadly missed.</p>
+<h3><a name="toc" id="toc"></a>Table of contents</h3>
+<ul>
+  <li><a href="#before_you_play">Before you play</a></li>
+  <li><a href="#introduction">Introduction</a></li>
+  <li><a href="#oi">"Oi! Did thee spill thy pint?"</a> </li>
+  <li><a href="#loading_the_game">Loading the game</a></li>
+  <li><a href="#playing_the_game">Playing the game</a></li>
+  <li><a href="#game_controls">Game controls</a></li>
+  <li><a href="#hints_tips">Hints &amp; tips</a></li>
+  <li><a href="#loading_new_cavefiles">Loading new Cavefiles </a></li>
+  <li><a href="#compatibility">Compatibility</a></li>
+  <li><a href="#riscpc_users">Risc PC Users</a></li>
+  <li><a href="#filing_systems">Filing systems</a></li>
+  <li><a href="#altering_filetype">Altering the Cavefile filetype</a></li>
+  <li><a href="#version_history">Version history </a></li>
+  <li><a href="#contacting_us">Contacting us </a></li>
+</ul>
+<h3><a name="before_you_play" id="before_you_play"></a>Before you play </h3>
+<p>Prior to version 1.25, we claimed that the game could function on all versions of RISC OS, including the different variants of emulation on Windows and other platforms, open source and commercial. However, it came to light that the sound modules as supplied with previous versions, would not function on 32-bit editions of RISC OS. I have now converted the sound modules to 26/32-bit neutrality, so the game, as of version 1.25 and later, should now function on 32-bit RISC OS based systems. As of January 2010, the game is being tested and developed on <a href="http://www.virtualacorn.co.uk/" target="_blank">VirtualRPC-SE</a>, which includes a copy of both RISC OS 4.02 and RISC OS 4.39 Adjust. The only issue is that of speed - the older your machine, the slower the gameplay. I would recommend at least a RISC PC 600 as a guide. <a href="#toc"><em>Back to top</em></a></p>
+<h3><a name="introduction" id="introduction"></a>Introduction </h3>
+<p>This text will explain how to load and play the game, as well as opening new level designs, called CaveFiles. But first, here is the plot. Yes, we've succumbed to temptation, and put one in! <a href="#toc"><em>Back to top</em></a></p>
+<h3><a name="oi" id="oi"></a>"Oi! Did thee spill thy pint?"</h3>
+<p>Back in the times when gallant knights were out fighting, and
+  everyone else were shovelling manure into horse carts, the
+  inn was a vital part of civilisation. You had the chance to
+  unwind, drink ale, and start barroom brawls. Interesting to note how not much has changed in the intervening years, has it? </p>
+<p>The only trouble was that manure shovelling and sword
+  fighting had the effect of flaring people's tempers, so the
+  smallest incident escalated into full scale violence. In an
+  inn, you had to be even more careful not to knock over any
+  full pints on your way out, otherwise you would be in trouble. </p>
+<p>You were unlucky enough to commit this dreaded act, and from
+  behind, you hear an angry voice asking  that most most feared of questions (the
+  one a couple of lines back, in case you'd forgotten).
+
+  Turning around, you protest your innocence to the seven foot
+  high wall of torso that is "Big Biceps" McCrinkle, who - unluckily for you - is one of the strongest warriors in the
+  land. His friends insist you are lying. To satisfy his pride, he challenges you to a fight to the death in
+  the caverns that lie beneath the kingdom's mountain range.
+  Feeling a warm sensation in your lower regions, you
+  relucantly agree to the showdown. </p>
+<p>You and McCrinkle are left in seperate caverns. You must find
+  weapons, food and armour among the caves, before meeting your
+  adversary and having a jolly good fight! <a href="#toc"><em>Back to top</em></a></p>
+<h3><a name="loading_the_game" id="loading_the_game"></a>Loading the game </h3>
+<p>To load Cavern Duel, double-click on the !CavenDuel icon in
+  your chosen directory. After a few seconds, the same icon
+  will appear on the right hand side of the icon bar on the
+  desktop.
+
+  Clicking the Menu (middle) mouse button on the icon will
+  bring up the following menu: </p>
+<ul>
+  <li><strong>Info</strong> Leads to a dialogue box showing the version and
+    author information. </li>
+  <li><strong>Instructions</strong> Loads this HTML file into your local web browser. </li>
+  <li><strong>Quit</strong> Quits the program. </li>
+</ul>
+<p>At this stage, you can play the game straight away by either
+  clicking on <strong>Play</strong> in the above menu, or clicking Select on the
+  !CavenDuel icon. The game is initially set up to load a
+  predefined CaveFile from within the !CavenDuel directory,
+  called 'Default'. <a href="#loading_new_cavefiles">This chapter</a> details how to open other CaveFiles.
+
+  The game itself takes over the machine, like most other games,
+  although you can return to the desktop at any time. </p>
+<p>After a short while, the main menu page should will be displayed.
+
+  Use the mouse to select 'Return to Desktop' to er, return to
+  the desktop. The Cavern Duel icon will still be on the icon
+  bar, but any game that was played will be reset, although the
+  CaveFile itself will still be in memory, so you don't have
+  to reload it. <a href="#toc"><em>Back to top</em></a></p>
+<h3><a name="playing_the_game" id="playing_the_game"></a>Playing the game </h3>
+<p>The main menu can be used to alter various aspects of the
+  game, such as the amount of weapons, food and teleports that
+  will be scattered throughout the caverns (these objects will
+  be explained later). The default values are fine for an
+  average game, but use the Select and Adjust buttons to alter
+  the values on the selected item.
+
+  Pressing spacebar or selecting 'Play Game' with the mouse,
+  will bring you into the game. </p>
+<p>The screen is divided into two
+  sections. The top section is for player one, the rest you can
+  figure out for yourself...
+
+  Each player has a status shield to the right of their playing
+  areas.  At the top of each is the player's currently held
+  weapon, while to the left is a bar showing the amount of
+  energy they have. The right bar shows the amount of shielding
+  the player has. In the middle of the shield is a magical map, showing the rough location of your opponent. This will aid you a little in finding them.</p>
+<p>Before finding your opponent, you will need to collect food
+  to increase your energy, weapons to attack your opponent
+  with, and shields to temporarily defend yourself against injury. These
+  objects, and various others, will be strewn around the
+  caverns, depending on the amounts set on the main menu.
+
+  Collecting armour helps you to survive longer during battle
+  than having no armour at all, which is <strong>not recommended</strong>.
+  Collecting any weapon will displace the original on the same
+  spot. These weapons vary in effectiveness and use; they can
+  either be thrown, fired or brandished. But it is down to you
+  and your opponent to figure out which ones are the best! </p>
+<p>Collecting food or red potion bottles gives you more energy.
+  Green bottles and magic teleports take you to a random
+  location within the caverns, while staircase teleports take
+  you to fixed locations, in particular areas which are
+  otherwise inaccessible.
+
+  You will also encounter 'dead spaces' throughout the caverns.
+  Although you cannot walk across these, you can fire weapons
+  across them. </p>
+<p>There is a Drawfile accompanying this game, entitled Key,
+  which contains a list of all the objects found in the game,
+  and what they look like. <a href="#toc"><em>Back to top</em></a></p>
+<h3><a name="game_controls" id="game_controls"></a>Game controls </h3>
+<p>Use the following keys to move your player around: </p>
+<table width="400" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <th scope="col">Player 1 (top) </th>
+    <th scope="col">Action</th>
+    <th scope="col">Player 2 (bottom) </th>
+  </tr>
+  <tr>
+    <td align="center">Z</td>
+    <td align="center">left</td>
+    <td align="center">B / Keypad 1 </td>
+  </tr>
+  <tr>
+    <td align="center">X</td>
+    <td align="center">right</td>
+    <td align="center">N / Keypad 2 </td>
+  </tr>
+  <tr>
+    <td align="center">F</td>
+    <td align="center">up</td>
+    <td align="center">K / Keypad 6 </td>
+  </tr>
+  <tr>
+    <td align="center">C</td>
+    <td align="center">down</td>
+    <td align="center">M / Keypad 3 </td>
+  </tr>
+  <tr>
+    <td align="center">G</td>
+    <td align="center">fire</td>
+    <td align="center">L / Keypad + </td>
+  </tr>
+</table>
+<p>If - like me - you are using a laptop with <em>VirtualAcorn</em> installed, alternative keys for player 2 have been added, although it would still be a tight squeeze between the pair of you. Alternatively, I could suggest a wireless or USB keyboard in the
+  meantime :-) </p>
+<p>The following keys are also available during play: </p>
+<ul>
+  <li>S/Q      - Sound on/off</li>
+  <li>Delete   - Pause </li>
+  <li>Copy     - Unpause </li>
+  <li>Tab      - Return to main menu </li>
+</ul>
+<p>Note that the current game is reset when you return to the
+  main menu, so don't use it unless you <strong>have</strong> to! <a href="#toc"><em>Back to top</em></a></p>
+<h3><a name="hints_tips" id="hints_tips"></a>Hints &amp; tips </h3>
+<p>The following hints and tips may be useful to you during the
+  game: </p>
+<ul>
+  <li>Collect as much armour as you can (like most knights!) </li>
+  <li>Find out which weapons are the most effective </li>
+  <li>Some fired weapons have a range of more than one screen. </li>
+  <li>Use food sparingly, no matter how much there is in the
+    caverns. </li>
+  <li>You cannot walk through dead spaces - the black icons,
+    but you can fire through them. </li>
+  <li>You cannot fire through any kind of teleport. </li>
+  <li>Not all the walls are solid. </li>
+  <li>The teleports are not always reliable in getting you
+    away from your opponent. </li>
+  <li>The game runs faster the higher the version of Arm chip
+    you have in your machine. </li>
+  <li>During battle, keep walking back and forth while firing
+    to really annoy annoy your opponent. </li>
+  <li>No food or weapons are placed on blue spaces. </li>
+  <li>If a player loses, don't let them hit the computer - we
+    don't want a real life depiction of the game! We also
+    cannot be held responsible for any injuries or damaged
+    sustained during gameplay. </li>
+  <li>Look out for the bonus rooms! </li>
+  <li>Until I resolve this in a future version, line 6460 of
+    the BASIC file <tt>Game</tt> has a time delay, currently set to 5.
+    This was adjusted from the original value of 1, as the
+    game froze under VirtualAcorn. You can adjust this to a
+    lower value if the speed is too slow on an older native
+    RISC OS machine. <a href="#toc"><em>Back to top</em></a></li>
+</ul>
+<h3><a name="loading_new_cavefiles" id="loading_new_cavefiles"></a>Loading new Cavefiles </h3>
+<p>As mentioned earlier, you can load other CaveFiles into the
+  game to play. There are in fact, two methods of loading
+  CaveFiles, a desktop based method, and a direct method from
+  within the game.
+
+  CaveFiles can be dragged to the !CavenDuel icon on the
+  desktop, which will load the game itself - a standard RISC OS
+  method. </p>
+<p>The other method requires more explanation. Shift double-
+  click on the !CavenDuel icon in your directory display. The
+  usual window containing the !Run, !Sprites and !RunImage
+  files will appear. In this window is a directory called
+  Screens. From this directory CaveFiles can be loaded from
+  the option on the main menu in the game itself. Double-click
+  on the Screens directory to reveal the supplied CaveFiles.
+  The one called 'Default' is loaded by the game automatically.
+
+  Now load the game, and select 'Load cave' from the main
+  menu page. The Screens directory is then catalogued. And,
+  hey presto! There is the Default file, along with all the
+  others you saw on the desktop earlier.
+
+  This option will only catalogue files which are filetyped as <tt>CaveFiles (&amp;022)</tt>. Any other files will not be catalogued. <a href="#toc"><em>Back to top</em></a></p>
+<h3><a name="compatibility" id="compatibility"></a>Compatibility </h3>
+<p>The game certainly runs fine on RISC OS 3.5 to Adjust 4.39, but may be slow on RISC OS 2 machines. RISC OS 5 users will require Aemulor or Aemulor Pro in order to run it. Virtual Acorn users will be able to run the game without any trouble on their desired platform. <a href="#toc"><em>Back to top</em></a></p>
+<h3><a name="riscpc_users" id="riscpc_users"></a>Risc PC users </h3>
+<p>The game runs quite fast on Risc PC machines, so no worry
+  there. The game also includes a timing loop (as described
+  above), so StrongARM owners can play the game at a reasonable
+  speed.
+
+  The game runs in 16 colour mode 12, and may be shown
+  letterboxed. Shown below is a monitor definition file for
+  mode 12, which you can attach to the appropriate monitor
+  file in the <tt>!Boot.Resources.Configure.Monitors</tt> directory.
+  It was taken from the !Xtreme megademo from BASS/Armaxess. </p>
+<p><tt># 640 x 256 mode (100Hz)<br />
+  startmode <br />
+  mode_name:
+  x_res:640
+  y_res:256
+  pixel_rate:26400 <br />
+  h_timings:120,40,0,640,50,0 <br />
+  v_timings:8,28,0,256,0,20 <br />
+  sync_pol:0 <br />
+  endmode </tt></p>
+<p>Attach this section of code to the very end of the monitor
+  definition file, and resave. Now reset the machine and load
+  the game. You will find the game fills the entire screen, and
+  looks much better than before. <a href="#toc"><em>Back to top</em></a></p>
+<h3><a name="filing_systems" id="filing_systems"></a>Filing systems </h3>
+<p>The Cavern Duel software is compatible with all filing
+  systems, including archives (if you only wish to play the
+  game). If you intend designing your own CaveFiles with
+  !CavernEd, and have a READ ONLY version of the archiver
+  software (!ArcFS being the most common) then you must
+  dearchive the software first, even more so if it was on a CD-ROM. <a href="#toc"><em>Back to top</em></a></p>
+<h3><a name="altering_filetype" id="altering_filetype"></a>Altering the CaveFile filetype </h3>
+<p>The default filetype is <tt>&amp;022</tt>, and its probable that there is
+  another application around, whether it is commercial or
+  otherwise, that uses it. To stop any unnecessary clashes,
+  you can alter the filetype to one that suits you.
+
+  But to do this will take a little while. So follow this
+  brief guide: </p>
+<ol>
+  <li>Load !Paint. Load the !Sprites file inside !CavenDuel. </li>
+  <li>Find the sprites <tt>file_022</tt> and <tt>small_022</tt>. </li>
+  <li>Press Menu, and go to the sprite <tt>file_022</tt> or whatever,
+    and go to the submenu. Go to Rename, to reveal the
+    entry box. Now replace the <tt>022</tt> with your chosen
+    filetype. Do the same with the other sprite. </li>
+  <li>Save the file. </li>
+  <li>Repeat the above procedure with the <tt>!Sprites22</tt> file. </li>
+  <li>Now load the <tt>!Boot</tt> and <tt>!Run</tt> file, and alter the <tt>022</tt> at
+    various lines to your chosen filetype. Resave them. </li>
+  <li>Load <tt>!RunImage</tt>, and alter <tt>&amp;022</tt> at line 1510 of <tt>PROCloadnewfile</tt>. Resave the file. </li>
+  <li>Load <tt>Game</tt>, and alter <tt>&amp;022</tt> at line 9730 of <tt>PROCloadnewcaves</tt>. Resave the file. </li>
+</ol>
+<p>And that's it. Just repeat the procedure if you find your
+  new filetype clashes with another application.
+
+  This information is repeated in the documentation accompanying
+  the !CavernEd application. <a href="#toc"><em>Back to top</em></a></p>
+<h3><a name="version_history" id="version_history"></a>Version history </h3>
+<ul>
+  <li><em>V1.00 (31st August, 1994) </em>
+      <ul>
+        <li>Used a Risc-OS front end.  Could be used on a 1 meg
+          machine but any other applications had to be quit first. </li>
+        <li>Menu was very different, had no 'load map' option, but it
+          still did the same. </li>
+        <li>Credits put in for when you quit. </li>
+        <li>Game was in mode 15!  So it was very slow even on an ARM3. </li>
+        <li>Since it was in mode 15 it used a lot of disk space. </li>
+        <li>No teleporters or staircases in this version. </li>
+      </ul>
+  </li>
+  <li><em>V1.10 (4th June, 1995) </em>
+      <ul>
+        <li>Risc-OS front end axed due to 1 meg machine problems
+          (i.e. The error 'No Room' appearing half way through a
+          game!) </li>
+        <li>New menu added, now has a 'Load Map' option, full
+          instructions and a Quit option (Which the other menu
+          didn't have!) </li>
+        <li>Game now uses mode 12 with a different colour palette,
+          speed increase is enormous.  Can run on an ARM2 machine
+          with great difficulty. </li>
+        <li>New ScreenDes added in a separate application. </li>
+      </ul>
+  </li>
+  <li><em>V1.15 (15th September, 1995) </em>
+      <ul>
+        <li>Tried to find ways of speeding up the game. Shortened
+          sprite op commands to increase speed. Shortened variable
+          names etc. Basically got rid of anything that hampered the
+          speed of the game. Gameplay zips along on the Risc PC, but
+          is a little slower with Cache Off, but much better than
+          before. </li>
+      </ul>
+  </li>
+  <li><em>V1.16 (17th September, 1995) </em>
+      <ul>
+        <li>Added a redefined mouse pointer, shaped like a sword, on
+          the main menu. </li>
+      </ul>
+  </li>
+  <li><em>V1.17 (18th September, 1995) </em>
+      <ul>
+        <li>Altered the screen map print routine, to make it more tidy. </li>
+        <li>Added another redefined mouse pointer, for the screen
+          loading routine. </li>
+        <li>Revamped the !Help text file. </li>
+        <li>Added fade routines to other areas of the game i.e. the
+          menu section. </li>
+      </ul>
+  </li>
+  <li><em>V1.18 (19th September, 1995) </em>
+      <ul>
+        <li>Added WIMP front end, cannibalised from Andy Southgate's
+          Oddball game. </li>
+        <li>Redesigned icon sprites, and included hi-res sprites. </li>
+      </ul>
+  </li>
+  <li><em>V1.19 (19th/20th September,1995) </em>
+      <ul>
+        <li>Allows for loading files onto icon bar. </li>
+      </ul>
+  </li>
+  <li><em>V1.20 (19th September, 1995) </em>
+      <ul>
+        <li>First fully working multi-tasking version. </li>
+      </ul>
+  </li>
+  <li><em>V1.21 (20th January, 1996) </em>
+      <ul>
+        <li>Altered CaveFile filetype from 020 to 022, because it was
+          clashing with !GZip, found on most ftp and web sites. </li>
+      </ul>
+  </li>
+  <li><em>V1.22 (4th December, 1997) </em>
+      <ul>
+        <li>Final release. Modified code of full game using
+          refinements from the demo version, such as timing loops
+          and better program loop. Still uses GOTOs though! </li>
+      </ul>
+  </li>
+  <li><em>V1.23 (2nd September, 2006) </em>
+      <ul>
+        <li>The game keys stall occasionally under VirtualRPC-SE on
+          my WinXP laptop. I've therefore made a few minor changes
+          to allow it to work correctly under the software. Also
+          reformatted the helpfiles for easier reading. </li>
+        <li>Other minor refinements. </li>
+      </ul>
+  </li>
+  <li><em>V1.24 (20th October, 2007)</em>
+    <ul>
+      <li>!CavenDuel WIMP front end is now created using <a href="http://www.rayfavre.me.uk/drwimp.html" target="_blank">Dr Wimp 4.70</a>. This is much cleaner code as a result.</li>
+      <li>Laptop compatible keys added for player 2</li>
+      <li>Refinements made regarding loading of data, wimpslot and sound modules.<a href="#toc"><em>Back to top</em></a></li>
+    </ul>
+  </li>
+  <li><em>V1.25 (12th November, 2007)</em>
+    <ul>
+      <li>Sound modules now made 26/32-bit neutral. Should now work on 32-bit versions of RISC OS.</li>
+      <li>Minor error correction regarding links to DrWimp library.</li>
+      <li>Further refinements to Obey files, concerning removal of voice modules.<a href="#toc"><em>Back to top</em></a></li>
+    </ul>
+  </li>
+  <li><em>V1.26 (17th January, 2010)</em>
+    <ul>
+      <li>Removed all 16 colour palette files. Everything is now done using COLOUR x,r,g,b now. This will stop anyones desktop from appearing in strange colours. For some reason, there are 3 different palettes, each with only minor differences. How odd?</li>
+      <li>Game code cleanup, specifically, removal of GOTOs and GOSUBs. Yuck!</li>
+    </ul>
+  </li>
+  <li><em>V1.27 (19th February, 2011)</em>
+    <ul>
+      <li>Addition of magic map. This was requested many moons ago by various people. I finally bit the bullet and added it in.</li>
+      <li>Minor presentation amendments.</li>
+    </ul>
+  </li>
+  <li><em>V1.271 (26th February, 2011)</em>
+    <ul>
+      <li>This point release fixed many bugs caused as a result of the code cleanup performed for v1.26, as well as my laptop plus and equal keys not working in VRPC (keyboard mapping issues). Here are the bugs fixed:
+      <ul>
+      <li>Player 2 bullets not displaying onscreen correctly, or not showing at all when on same screen as player 1.</li>
+      <li>Player 2 shield display not functioning properly</li>
+      <li>Error message upon using held weapon (affected player 2 usually)
+      </ul></li>
+    </ul>
+  </li>
+  </ul>
+<h3><a name="contacting_us" id="contacting_us"></a>Contacting us </h3>
+<p>Visit the dedicated Cavern Duel page at www.sassquad.com for the latest news on the
+  game. <a href="#toc"><em>Back to top</em></a></p>
+<p><em>&copy; Stephen Scott 2007,2011. Document last updated 26th February, 2011.</em></p>
+<p>Page markup by <a href="http://www.adobe.com/dreamweaver" target="_blank">Adobe Dreamweaver CS3, StrongEd</a>. XHTML 1.1 Transitional. RISC OS Browsers of choice: <a href="http://netsurf.sourceforge.net/" target="_blank">Netsurf</a>, <a href="http://www.riscos.info/unix/firefox/" target="_blank">Firefox</a>, <a href="http://www.oreganouk.net/oregano2.html" target="_blank">Oregano</a> </p>
+</body>
+</html>

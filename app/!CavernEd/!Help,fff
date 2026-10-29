@@ -1,0 +1,489 @@
+Cavern Duel Editor
+
+Version 1.37 (4th December, 1997)
+
+By Graeme and Stephen Scott
+with the aid of !WimpEd by Joe Taylor © Archimedes World 1992
+© June 1994 - December 1997. Revisited August 2006
+
+
+
+  /\
+  \/  INTRODUCTION
+
+      Welcome to the Cavern Duel Editor text file (or document if you've
+      printed this out!). This text will explain how to load and use the
+      editor.
+
+      Version 1.37 is the first release of this software to the public,
+      and as such is lacking in features. It's taken me six months alone
+      just to get the Wimp code working at this stage, so I've kept it
+      very simple for easy use. It is unlikely that the editor will be
+      improved, except for bug fixes. The program is provided "as is"
+      and we cannot be held responsible for any data loss caused by its
+      use.
+
+      The editor allows you to design your own CaveFiles for use in the
+      Cavern Duel game. They can then be dragged to the !CavenDuel icon
+      to play (after saving the CaveFile to disc/hard disc beforehand!),
+      or be moved into the Screens directory inside the !CavenDuel
+      application structure for loading within the game. See the
+      !CavenDuel documentation for details on how to implement this
+      feature.
+
+      The editor allows you to design a CaveFile of any size up to a
+      maximum of eight screens long, and four screens high, making 32
+      interconnected screens, of 16x16 icons. You can only edit one
+      CaveFile at a time, although there is nothing wrong in loading
+      another copy of !CavernEd to edit another at the same time.
+
+  /\
+  \/  LOADING THE EDITOR
+
+      If the Cavern Duel software is in an archive, and you have a read
+      only version of the dearchiver, then you will need to copy all the
+      software out of the archive, otherwise you cannot save CaveFiles.
+
+      To load the Cavern Duel Editor, double-click on the !CavernEd icon
+      in your chosen directory. After a few seconds, the same icon will
+      appear on the right hand side of the icon bar on the desktop.
+
+      Alternatively, you can double-click on any CaveFile to load the
+      editor. Unfortunately, in this version (1.37) that CaveFile will
+      not be loaded for editing. Any help on this would be appreciated.
+
+      Clicking the Menu (middle) mouse button on the icon will bring up
+      the following menu:
+
+          Info >        Leads to a dialogue box showing the version and
+                        author information.
+          Instructions  Loads this text into a text editor such as !Edit
+                        or !Zap.
+          Quit          Quits the program.
+
+      To edit a new CaveFile, click Select on the !CavernEd icon, or drag
+      a CaveFile to the !CavernEd icon. In either case, three windows
+      will pop up. These windows will be described in the next section.
+
+  /\
+  \/  USING THE EDITOR
+
+      The editor uses three windows, called the editor window, map window
+      and icons window.
+
+         * THE EDITOR WINDOW
+
+         This is the largest of the windows, and shows the currently
+         selected screen. The title bar will show the coordinates of this
+         screen in relation to the map window (see later).
+
+         Pressing Menu over this window will bring up another menu.
+
+            Info - Shows program information.
+
+            Save - A standard savebox.
+
+         The other mouse buttons are used to draw inside the currently
+         selected screen. Two different icons can be used at once. By
+         default, Select draws simple paths, while Adjust draws with
+         the eraser icon. These icons will be explained later.
+
+         * THE MAP WINDOW
+
+         This window displays an 8 x 4 matrix of the cavern system, 32
+         screens in all. To display a particular screen, just click on
+         the required map icon, and the window will be updated.
+
+         * THE ICONS WINDOW
+
+         This window looks more complex than the others. It shows the
+         available icons required for building the cavern system, and for
+         placing specific objects. The icons are split into distinct
+         groups.
+
+         At the bottom of this window are the currently selected draw and
+         erase icons. By default, the draw icon is a stone block, while the
+         erase icon is a grey path. These icons are described below. To
+         select a new draw icon, use the Select button, and the Adjust
+         button for a new erase icon.
+
+         Here is a description of the game icons:
+
+            * PATH ICONS: There are six icons under this section, five of
+            which can be walked on. From left to right, going down, they
+            are:
+
+               Grey path icon : a normal path icon.
+
+              Grey paved icon : a normal path icon.
+
+              Brown tile icon : a normal, but prettier path icon.
+
+             Purple path icon : This is the first of three special path
+                                icons under this section. This one doesn't
+                                allow any objects to be placed at random
+                                on it, leaving very bare areas if used
+                                excessively.
+
+          Disguised path icon : Looks like one of the block icons, doesn't
+                                it? Well it isn't!
+
+               Null path icon : This icon allows nothing at all to be
+                                placed on it. This is useful for defining
+                                strange shape caverns, such as circular
+                                ones. The outer areas can be painted with
+                                this icon, to stop objects being placed
+                                out of reach, or you from being teleported
+                                out into nowhere
+
+                                The "Complex" and "MontMyrder" CaveFiles
+                                are very good examples of the use of this
+                                icon. Load them in now and have a look.
+                                If you do this, then a message will pop up
+                                - this will be explained later.
+
+            * ITEM ICONS: Again, there are six icons which are all of use
+            to the dueller. From left to right, going down, they are:
+
+               Shield : Extra shielding for battle.
+
+                Apple : The first of four icons for replenishing energy.
+
+                 Fish : Another form of energy.
+
+             Sandwich : Yet another form of energy.
+
+           Red potion : A different form of energy - this one's magic!
+
+         Green potion : A random teleport potion.
+
+            * WALL ICONS: A set of four icons, which all act the same way,
+            to make the cavern layouts.
+
+            * TELEPORTS: Two icons, the first is a random teleport, just
+            like the green potion bottle. But the second one is a
+            staircase teleport, which which can take you to a specific
+            location of your choice. This last one needs a section of its
+            own, so it will be described later.
+
+            * PLAYERS: These icons are special, because there can never be
+            more than one of each of them. Both Select and Adjust can be
+            used to place the player icons, and if you change your mind
+            about the location of either, then clicking elsewhere will
+            automatically place them there, deleting their old positions.
+            It is quite simple really.
+
+  /\
+  \/  PLACING STAIRCASE TELEPORTS
+
+      Staircase teleports require a user defined destination in order to be
+      of any use. So when you place one, keep the staircase as the currently
+      selected icon (if you use any other, then the teleport will be wiped)
+      and double-click on any teleport.
+
+      The icons window will disappear, being replaced by a new one,
+      showing the destination coordinates of that teleport. In the editor
+      window, a purple four pointed cursor will appear over the teleport.
+      This shows whereabouts on the current screen the teleport will take
+      you to.
+
+      You can still use the map window to select a different screen. The
+      cursor will stay in the same place, whether the block underneath it
+      is a path or not. Just click in the editor window to move the cursor
+      to the desired position. Or alternatively, use the bump icons to
+      alter the coordinates. All the windows interact and update with each
+      other (I hope!)
+
+      There are two ways you can escape from this mode. You can either click
+      on Cancel, which will reset the current teleport's coordinates to
+      the same coordinates as the teleport, or click on OK, which will save
+      the details into memory. If the destination is over anything other
+      than a path icon, then you will be warned about it, and plonked back
+      into the mode.
+
+      Upon exiting this mode, the teleport window will disppear, and the
+      icons window will reappear, returning you to normal editing mode.
+      I know this sounds a little scrappy, but it was the only way I
+      could think of addressing this procedure.
+
+  /\
+  \/  HINTS, TIPS AND DESIGN RESTRICTIONS
+
+      Here are some useful design hints and tips:
+
+         * Save your work regularly! You never know if there is a fatal
+           error or power cut round the corner.
+         * Don`t have too many single spaces enclosed in stone; there is
+           the possibility that you may get teleported there in the game,
+           causing much annoyance!
+         * Try and position the players starting positions as far away as
+           possible. It`s much more fun finding each other then!
+         * Don`t get your inpeneterable blocks mixed up with the
+           transparent ones. Consult the Draw file ”Icons• for reference.
+         * Make sure you have a boundary surrounding the outer fringes of
+           your screens, otherwise the game will crash, when you wander out!
+         * Make bonus rooms (places with lots of goodies) difficult to get
+           to (the ”Complex• file is a prime example!).
+         * Be creative! The results may take a while to perfect, but it is
+           worth it in the end!
+
+      As long as you follow these rules, you should have no trouble in
+      designing some fiendish caverns!
+
+  /\
+  \/  LOADING AND SAVING CAVEFILES
+
+      CaveFiles can be loaded into !CavernEd, by dragging them to the
+      !CavernEd icon on the icon bar. Other methods aren't yet possible,
+      any help on this would be appreciated. Saving is standard RISC OS
+      fashion, except that the F3 key is not supported.
+
+  /\
+  \/  DISTRIBUTION OF CAVEFILES
+
+      CaveFiles designed by !CavernEd are copyright free and may be sent
+      anywhere (PD libraries, ftp sites etc.). Yes, you have complete
+      autonomy over what to do with your CaveFiles. The only restriction is
+      that you cannot make a profit out of them. CaveFiles may be sent to
+      magazines for inclusion on their cover discs, as long as they are
+      termed as public domain. Do not use the magazines as a
+      way of earning money.
+
+  /\
+  \/  KNOWN PROBLEMS WITH THE SOFTWARE
+
+      Since this is the first release of !CavernEd, it is very basic in
+      use and design. Therefore, there are bound to be lots of things
+      that you would like to see in future releases of the software.
+
+      The problem is that we, the authors will not be giving our total
+      support to the software anymore, as we want to move onto pastures
+      new i.e. other programming projects. Any updates will be very few
+      and far between, and they will probably be just minor bug fixes,
+      along with the Cavern Duel game.
+
+      One silly little problem is that the Screen Window is quite slow to
+      update, so try not to drag any other windows over it, otherwise it
+      all gets very jerky, especially on Arm2 based machines.
+
+      Try not to change modes too often on some machines. The Risc PC is a
+      case in point. The game icons may become distorted in certain modes,
+      such as 49. The icon sprite for !CavernEd may change to the mode 12
+      equivalent, if this mode is selected. To summarise: only change mode
+      if you absolutely have to! This effect is very unpredictable; some
+      times it may be uneventful, other times it may be mildly annoying,
+      but never fatal!
+
+      The current templates were defined on a Risc OS 3.5 machine, using
+      the Homerton desktop font. On older machines, the system font text
+      may not fit in the boxes, or may appear out of alignment with other
+      lines.  If this is the case then we apologise for this. This editor
+      has also been tested under version 3.97 of the window manager, as
+      originally included on the AcornSoft Beta CD of late 1997.
+
+      The software is not fully error trapped against a user's design. We
+      have removed what we think are the most obvious bugs, but there may
+      be others that were virtually undetectable to us, but pop up
+      unexpectantly. We recommend saving your work regularly, to save
+      pulling your hair out when its too late! Bugs in your caverns can
+      only be found out by playtesting. Do contact us if you find any
+      strange bugs in your version.
+
+      Having seen Andrew Ayre's DrWimp programming system, I can safely
+      say that it is a much better system to program with, and I will be
+      using it for future projects.
+
+      Features of it include the use of interactive help and message
+      files for foreign users.  If this software is successful enough,
+      then we will get to work!
+
+  /\
+  \/  FILING SYSTEMS
+
+      The !CavernEd software is compatible with all filing systems,
+      except archives (if you have a read only dearchiver). If you
+      intend designing your own CaveFiles with !CavernEd, and have a READ
+      ONLY version of the archiver software (!ArcFS being the most common)
+      then you must dearchive the software first.
+
+      At present, you cannot write to CD-ROMs. So, if this software came
+      on a public domain CD-ROM, then you must copy it to another disc or
+      to your hard drive system.
+
+  /\
+  \/  ALTERING THE CAVEFILE FILETYPE
+
+      The default filetype is &022, and its probable that there is another
+      application around, whether it is commercial or otherwise, that uses
+      it. To stop any unnecessary clashes, you can alter the filetype to
+      one that suits you. You will require a template editor, such as
+      !FormEd or !TemplEd to alter the templates files that contain
+      references to the filetype sprites.
+
+      But to do this will take a little while. So follow this brief guide:
+
+         * Load !Paint. Load the !Sprites file inside !CavernEd.
+         * Find the sprites ”file_022• and ”small_022•.
+         * Press Menu, and go to the sprite ”file_022• or whatever, and go
+           to the submenu. Go to Rename, to reveal the entry box. Now
+           replace the ”022• with your chosen filetype. Do the same with
+           the other sprite.
+         * Save the file.
+         * Repeat the above procedure with the !Sprites22 file.
+         * Now load the !Boot and !Run file, and alter the 022 at various
+           lines to your chosen filetype. Resave them.
+         * Load !RunImage, and use the search and replace routine in the
+           text editor to find and replace all references to 022 with
+           your new filetype. Resave the file.
+         * Load your template editor, and load in turn both sets of
+           templates. Find the savebox window and change the sprite icon's
+           name from "file_022" to one that has the new filetype. Resave
+           the file.
+         * Do the above with the files within the !CavenDuel application.
+           Read the !CavenDuel documentation to find out how.
+
+History of !CavernEd (formerly called !MapDesign)
+-------------------------------------------------
+
+V1.00 (June/July 1994)
+-----
+ * Used a system using separate files for every screen.
+ * User interface very primative.  Used cursor keys to select blocks.
+ * Had a habit of saving files wrongly.
+ * Teleporter details had to be put into the files manually (Ugh!).
+ * No on-screen text.
+
+V1.10 (31st August, 1994)
+-----
+ * Improved presentation.
+ * Used the new map system, saving all the screens and teleporter details into
+   one 8K file.
+ * Methods of storing the map in memory and displaying it on screen are the same
+   as the ones in the main game.
+ * Mouse can now be used to select icons on the screen (i.e. Selecting map icons,
+   altering teleporter details and loading/saving screens).
+ * User friendly interface.
+ * User friendly map selecting interface for loading maps (Can't do it for saving
+   yet!)
+ * Option to display the entire map on screen.
+
+V1.20 (4th June, 1995)
+-----
+ * Now totally mouse controlled (Except for saving maps!).
+ * Method for deleting mistakes now improved as you can change the block to
+   clear with.
+ * Mouse lock for easier map editing.
+ * Cursors and mouse can be used to look around the map.
+
+V1.21 (22nd-30th September, 1995)
+-----
+ * Attempted a multi-tasking version, but failed. Came up with a
+   semi-multi-tasking version. A step back perhaps, but a much easier one!
+   Perhaps a later version will to the biz.
+ * Not displaying checker window at various points in the program. (25/9/95)
+
+V1.25 (14th October, 1995)
+-----
+ * WIMP version going very well. Some problems with the teleporter code and
+   updating player positions.
+ * Checker box not displayed in centre of screen on Risc PC machine.
+ * Tick menu items not correct for map and icon window presence status.
+
+V1.29 (20th December, 1995 onwards)
+-----
+ * Attempting to resolve teleporter code and other minor bugs.
+ * Removed map and icon window menu items (20/12/95)
+ * Remember to have routine to check that all teleport destinations are defined
+   before file is saved, and to check that destination is not the same location
+   as where you entered the teleport - prevents looping in the game.
+
+Oooh! These bugs are a pain up the passage! Thank God for 'Free as a Bird'!
+
+V1.30 (24th December, 1995)
+-----
+ * Map window now uses sprites (slabbed icons). Need way of updating this window
+   from the teleport window. At present, map window can only be altered directly!
+
+   Getting address exception errors - connected with indirected sprites in map
+   window. Later found out I was using wrong procedure in WimpEd! (24/12/95)
+
+   Trying to get all three windows to interact - proving very difficult!
+   Teleport window needs more work.
+
+   With any luck, all obvious bugs will be resolved by New Year. Perhaps even a
+   hopeful release in January 1996
+
+   Teleports are still a pain. The windows now interact, but how to distinguish
+   one teleport from another? One answer: Select teleport from icon window, and
+   click Select on an already placed teleport, and you will be taken to its
+   destination. Perhaps invert the destination icon?
+
+V1.31 - 6th January, 1996
+-----
+ * Teleport stuff getting there. Map window still leaving stuff. When teleport
+   window appears, screen window needs to go straight there, along with map
+   window (at present only map window does it. Needs bit of code added.)
+
+   Altered teleport window. Teleport number is of no importance. Now just shows
+   destination map and screen coords. 3 buttons - delete, cancel and ok. Delete
+   should delete teleport, cancel resets destination to position of teleport, and
+   OK stores the details.
+
+   Added feature where clicking on teleport while teleport icon is selected,
+   brings you directly to the teleport window. Map and screen windows then
+   updated to show you destination. Inverted box should appear, showing screen
+   coordinate of chosen teleport (not supported at present)
+
+   Last day before university - and i'm so close to finishing!
+
+   9/1/96 - Skip the last comments. The teleports are screwing up again! Im
+   getting variables and numbers mixed up badly. Will have to go back to
+   Graeme's coding to give the whole teleport thing a rewrite. Grrr....!
+
+V1.33 (14th January, 1996)
+-----
+ * **SUCCESS!**
+   The teleport routine now works properly ... for now. But
+   it will still need to undergo extensive testing. One problem I can forsee is
+   accidently deleting a teleport by clicking an icon other than a teleport on
+   it! Ive done it a few times myself. Perhaps use of the menu button, or a
+   checker box asking if you are sure you want to delete the teleport?
+
+   I added a special purple sprite showing the destination coordinates of the
+   chosen teleport. Also removed the Delete icon from the teleport window.
+
+V1.34 (20th January, 1996)
+-----
+ * Altered CaveFile filetype from 020 to 021, as it was clashing with the !GZip
+   de/archiver software.
+ * Correcting purple icon bug, allowing you to move it when it is on a solid
+   block. At the moment it gets stuck!
+ * Corrected bug with screen data. When drawing, the sprite name is used in the
+   data array. Block 4 has three forms - 4, 40 and 41. 40 and 41 are only used
+   in the editor. 4 is used in the map data. But I used 40 instead, resulting in
+   a 2 digit number in the otherwise 1 digit data, producing messed up CaveFiles
+
+V1.35 (21st January, 1996)
+-----
+ * Managed to stop map window from printing two depressed icons at once instead
+   of the usual one icon at the teleport placing section of the program.
+
+   This bug marks the last major hurdle in the development of the program.
+   This is the earliest release version of !CavernEd
+
+   V1.35 earliest release
+
+V1.36 (started 13th August, 1997)
+-----
+ * Tweaked the draw and erase icons at startup to more suitable ones.
+
+V1.37 (4th December, 1997)
+-----
+ * Fixed a bug in the map window, and replaced all the OSCLI's with SYS XOS_CLI
+   commands. Final release.
+
+
+  /\
+  \/  CONTACTING US
+
+      Visit www.sassquad.com/cavernduel for the latest news and updates.

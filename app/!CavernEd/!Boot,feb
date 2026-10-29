@@ -1,0 +1,13 @@
+|
+| !Boot file for !CavernEd 1.36 (13th August, 1997)
+| By Graeme and Stephen Scott
+| 
+|
+IconSprites <Obey$Dir>.!Sprites
+Set CavernEd$Dir <Obey$Dir>
+Set CavernEd$Path <Obey$Dir>.
+Set CavernEdResource$Path CavernEd:Resources
+Set Game$Path CavenDuel:Screens
+Set File$Type_022 CaveFile
+Set Alias$@RunType_022 Run <CavernEd$Dir>.!Run %*0
+Set Alias$@LoadType_022 Run <CavernEd$Dir>.!Run %*0

@@ -1,0 +1,10 @@
+Set CavenDuel$Dir <Obey$Dir>
+
+Iconsprites <CavenDuel$Dir>.!Sprites
+Set CavenDuel$Dir <Obey$Dir>
+Set CavenDuel$Path <Obey$Dir>.
+Set CaveResource$Path CavenDuel:Resources
+Set Game$Path CavenDuel:Screens
+Set File$Type_022 CaveFile
+Set Alias$@RunType_022 Run <CavenDuel$Dir>.!Run %%*0
+Set Alias$@LoadType_022 Run <CavenDuel$Dir>.!Run %%*0

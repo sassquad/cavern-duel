@@ -1,0 +1,10 @@
+{
+  // BASIC sources must keep exact spacing and LF endings to round-trip
+  "files.trimTrailingWhitespace": false,
+  "files.insertFinalNewline": true,
+  "files.eol": "\n",
+  "files.encoding": "utf8",
+  "search.exclude": { "reference/**": true },
+  // Built output: edit src/*.bas instead
+  "files.readonlyInclude": { "app/**/*,ffb": true }
+}

@@ -1,0 +1,5 @@
+# Built from src/*.bas by tools/build.py
+app/**/*,ffb
+deploy.local.json
+__pycache__/
+.DS_Store

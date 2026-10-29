@@ -1,0 +1,41 @@
+Set CavenDuel$Dir <Obey$Dir>
+Iconsprites <CavenDuel$Dir>.!Sprites
+Set CaveResource$Path CavenDuel:Resources
+Set File$Type_022 CaveFile
+Set Alias$@RunType_022 Run <CavenDuel$Dir>.!Run %%*0
+Set Alias$@LoadType_022 Run <CavenDuel$Dir>.!Run %%*0
+
+WimpSlot -max 16K -min 16K
+WimpSlot -max 560K -min 560K
+WimpSlot -max 480K -min 480K
+
+| Sound bit
+Tuning 0
+Tuning 1000
+| Check for riscpc doggy tuning bend thing
+RMEnsure UtilityModule 3.5 Tuning 0
+RMEnsure ObjGet RMLoad CavenDuel:Sounds.0
+RMEnsure ObjGet Error Could not load ObjGet FX module.
+RMEnsure Rotate RMLoad CavenDuel:Sounds.1
+RMEnsure Rotate Error Could not load 'Rotate' FX module.
+RMEnsure Sides RMLoad CavenDuel:Sounds.2
+RMEnsure Sides Error Could not load 'Sides' FX module.
+RMEnsure Arg RMLoad CavenDuel:Sounds.3
+RMEnsure Arg Error Could not load 'Arg' FX module.
+RMEnsure Fire RMLoad CavenDuel:Sounds.4
+RMEnsure Fire Error Could not load 'Fire' FX module.
+RMEnsure Hit RMLoad CavenDuel:Sounds.5
+RMEnsure Hit Error Could not load 'Hit' FX module.
+
+Run <CavenDuel$Dir>.Game
+
+| Clear Up bit
+RMKill ObjGet
+RMKill Rotate
+RMKill Sides
+RMKill Arg
+RMKill Fire
+RMKill Hit
+ChannelVoice 1 1
+IF "<Screenblanker>"="True" THEN RMReinit Screenblanker
+Unset Screenblanker

@@ -1,0 +1,13 @@
+| !Run file for !CavernEd map designer (Version 1.36 - 13th August, 1997)
+| By Graeme Scott. WIMP front end by Stephen Scott September 1995
+| 
+|
+IconSprites <Obey$Dir>.!Sprites
+Set CavernEd$Dir <Obey$Dir>
+Set CavernEd$Path <Obey$Dir>.
+Set CavernEdResource$Path CavernEd:Resources
+Set Game$Path CavenDuel:Screens Error 255 I can't find the Screens directory inside !CavenDuel
+Set File$Type_022 CaveFile
+Set Alias$@RunType_022 Run <CavernEd$Dir>.!Run %*0
+Set Alias$@LoadType_022 Run <CavernEd$Dir>.!Run %*0
+CavernEd:!RunImage

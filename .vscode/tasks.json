@@ -1,0 +1,67 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build",
+      "detail": "Tokenise src/*.bas into the HostFS app folder",
+      "type": "shell",
+      "command": "python3 tools/build.py build",
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": {
+        "owner": "bbcbasic",
+        "fileLocation": ["relative", "${workspaceFolder}"],
+        "pattern": {
+          "regexp": "^(.*): error: text line (\\d+): (.*)$",
+          "file": 1,
+          "line": 2,
+          "message": 3
+        }
+      },
+      "presentation": { "reveal": "silent", "revealProblems": "onProblem" }
+    },
+    {
+      "label": "Deploy to RPCEmu",
+      "detail": "Build, then copy app/ to the HostFS folder in deploy.local.json",
+      "type": "shell",
+      "command": "python3 tools/build.py deploy",
+      "problemMatcher": []
+    },
+    {
+      "label": "Run on RISC OS 5",
+      "detail": "Build, then start RPCEmu with the RISC OS Direct machine",
+      "type": "shell",
+      "command": "tools/rpcemu.sh direct",
+      "dependsOn": "Build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Run on RISC OS 3.71",
+      "detail": "Build, then start RPCEmu with the RISC OS 3.71 machine",
+      "type": "shell",
+      "command": "tools/rpcemu.sh 371",
+      "dependsOn": "Build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Pull BASIC from app",
+      "detail": "Detokenise ,ffb files edited inside RISC OS back into src/",
+      "type": "shell",
+      "command": "python3 tools/build.py pull",
+      "problemMatcher": []
+    },
+    {
+      "label": "Check sources",
+      "detail": "Tokenise every source and confirm it round-trips",
+      "type": "shell",
+      "command": "python3 tools/build.py check",
+      "problemMatcher": []
+    },
+    {
+      "label": "Test tokeniser",
+      "type": "shell",
+      "command": "python3 tools/test_bbcbasic.py",
+      "group": { "kind": "test", "isDefault": true },
+      "problemMatcher": []
+    }
+  ]
+}
