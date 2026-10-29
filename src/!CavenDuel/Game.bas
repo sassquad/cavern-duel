@@ -350,7 +350,7 @@
 350 PROCshadow("     Tab - Return to main menu",400-32,252,0,4)
 351 REM
 352 PROCshadow("© Graeme & Stephen Scott 1994-2011",(23*16),80,9,4)
-353 PROCshadow("Visit www.sassquad.com for the latest updates",(17.5*16),32,9,4)
+353 PROCshadow("Visit www.sassquad.net for the latest updates",(17.5*16),32,9,4)
 354 VDU4
 355 ENDPROC
 356 :
