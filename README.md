@@ -4,6 +4,9 @@ A two-player maze game for RISC OS, by Graeme and Stephen Scott (1994–2011).
 This repository is set up for development in VS Code on a Mac, testing under
 RPCEmu and on real RISC OS 5 hardware.
 
+More about the game, including the latest release to download, is at
+<https://www.sassquad.net/cavernduel>.
+
 ## Layout
 
 ```
