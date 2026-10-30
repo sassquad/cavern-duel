@@ -29,7 +29,7 @@
 29 DIM block% 64,scale% 15
 30 DIM fname$(25)
 31 DIM screen$(7,3,16,16)
-32 DIM YOUX(2),YOUY(2)
+32 DIM YOUX(2),YOUY(2),pad%(2)
 33 DIM move(2)
 34 DIM dire$(2)
 35 DIM anim(2)
@@ -603,7 +603,7 @@
 603 REPEAT
 604 SYS 46,&222,grab%,bg%,0,0,0
 605 SYS 46,&222,grabtwo%,bg2%,0,512,0
-606 :
+606 PROCreadkeys:REM Every key is read here, once a frame; the game below only looks at pad%() and ctl%
 607 IF energy(1)>0:IF keycheckrate=1:PROCkeys1
 608 gapdo=0
 609 weptype=0
@@ -617,18 +617,18 @@
 617 IF gapdo=0 THEN
 618 PROCcheckweps
 619 ELSE
-620 IF weptype=1:IF INKEY-84:IF energy(1)>0:IF keycheckrate=1:PROCfire1
-621 IF weptype=2:IF INKEY-84:IF energy(1)>0:IF gapdo=1:PROCfire1
+620 IF weptype=1:IF pad%(1) AND 16:IF energy(1)>0:IF keycheckrate=1:PROCfire1
+621 IF weptype=2:IF pad%(1) AND 16:IF energy(1)>0:IF gapdo=1:PROCfire1
 622 PROCcheckweps
 623 ENDIF
 624 :
 625 IF energy(2)>0:IF keycheckrate=1:PROCkeys2
-626 IF INKEY-59 OR INKEY-87:IF energy(2)>0:IF keycheckrate=1:PROCfire2
+626 IF pad%(2) AND 16:IF energy(2)>0:IF keycheckrate=1:PROCfire2
 627 PROCcheckweps2
-628 IF INKEY-90 THEN REPEAT UNTIL INKEY-106
-629 IF INKEY-17:SYS "XOS_CLI","SPEAKER OFF"
-630 IF INKEY-82:SYS "XOS_CLI","SPEAKER ON"
-631 IF INKEY-97:end%=1:SYS "XOS_CLI","CHANNEL. 2 ARG":SOUND2,-15,&100,100
+628 IF ctl% AND 1 THEN REPEAT UNTIL INKEY-106
+629 IF ctl% AND 2:SYS "XOS_CLI","SPEAKER OFF"
+630 IF ctl% AND 4:SYS "XOS_CLI","SPEAKER ON"
+631 IF ctl% AND 8:end%=1:SYS "XOS_CLI","CHANNEL. 2 ARG":SOUND2,-15,&100,100
 632 player%=1:PROCprint:PROCprintbuls1
 633 player%=2:PROCprint:PROCprintbuls1
 634 PROCprintother
@@ -670,18 +670,18 @@
 670 :
 671 DEF PROCkeys1
 672 player%=1
-673 IF INKEY-98:YOUX(player%)-=1:move(player%)=0:dire$(player%)="l":buld1=3:PROCcheck:PROCcheckarea:anim(player%)=anim(player%)+1:PROCprint:PROCclear:ENDPROC
-674 IF INKEY-67:YOUX(player%)+=1:move(player%)=1:dire$(player%)="r":buld1=1:PROCcheck:PROCcheckarea:anim(player%)=anim(player%)+1:PROCprint:PROCclear:ENDPROC
-675 IF INKEY-68:YOUY(player%)+=1:move(player%)=2:dire$(player%)="u":buld1=0:PROCcheck:PROCcheckarea:anim(player%)=anim(player%)+1:PROCprint:PROCclear:ENDPROC
-676 IF INKEY-83:YOUY(player%)-=1:move(player%)=3:dire$(player%)="d":buld1=2:PROCcheck:PROCcheckarea:anim(player%)=anim(player%)+1:PROCprint:PROCclear
+673 IF pad%(1) AND 1:YOUX(player%)-=1:move(player%)=0:dire$(player%)="l":buld1=3:PROCcheck:PROCcheckarea:anim(player%)=anim(player%)+1:PROCprint:PROCclear:ENDPROC
+674 IF pad%(1) AND 2:YOUX(player%)+=1:move(player%)=1:dire$(player%)="r":buld1=1:PROCcheck:PROCcheckarea:anim(player%)=anim(player%)+1:PROCprint:PROCclear:ENDPROC
+675 IF pad%(1) AND 4:YOUY(player%)+=1:move(player%)=2:dire$(player%)="u":buld1=0:PROCcheck:PROCcheckarea:anim(player%)=anim(player%)+1:PROCprint:PROCclear:ENDPROC
+676 IF pad%(1) AND 8:YOUY(player%)-=1:move(player%)=3:dire$(player%)="d":buld1=2:PROCcheck:PROCcheckarea:anim(player%)=anim(player%)+1:PROCprint:PROCclear
 677 ENDPROC
 678 :
 679 DEF PROCkeys2
 680 player%=2
-681 IF INKEY-108 OR INKEY-101:YOUX(player%)-=1:move(player%)=0:dire$(player%)="l":buld2=3:PROCcheck:PROCcheckarea:anim(player%)+=1:PROCprint:ENDPROC
-682 IF INKEY-125 OR INKEY-86:YOUX(player%)+=1:move(player%)=1:dire$(player%)="r":buld2=1:PROCcheck:PROCcheckarea:anim(player%)+=1:PROCprint:ENDPROC
-683 IF INKEY-27 OR INKEY-71:YOUY(player%)+=1:move(player%)=2:dire$(player%)="u":buld2=0:PROCcheck:PROCcheckarea:anim(player%)+=1:PROCprint:ENDPROC
-684 IF INKEY-109 OR INKEY-102:YOUY(player%)-=1:move(player%)=3:dire$(player%)="d":buld2=2:PROCcheck:PROCcheckarea:anim(player%)+=1:PROCprint
+681 IF pad%(2) AND 1:YOUX(player%)-=1:move(player%)=0:dire$(player%)="l":buld2=3:PROCcheck:PROCcheckarea:anim(player%)+=1:PROCprint:ENDPROC
+682 IF pad%(2) AND 2:YOUX(player%)+=1:move(player%)=1:dire$(player%)="r":buld2=1:PROCcheck:PROCcheckarea:anim(player%)+=1:PROCprint:ENDPROC
+683 IF pad%(2) AND 4:YOUY(player%)+=1:move(player%)=2:dire$(player%)="u":buld2=0:PROCcheck:PROCcheckarea:anim(player%)+=1:PROCprint:ENDPROC
+684 IF pad%(2) AND 8:YOUY(player%)-=1:move(player%)=3:dire$(player%)="d":buld2=2:PROCcheck:PROCcheckarea:anim(player%)+=1:PROCprint
 685 ENDPROC
 686 :
 687 DEF PROCscreen(E,F,PLAY%)
@@ -1234,7 +1234,7 @@
 1234 IF playeronewin:PROCprintonewin(c)
 1235 IF playertwowin:PROCprinttwowin(c)
 1236 IF playerdraw:PROCprintdraw(c)
-1237 IF INKEY-99:counttillend%=90
+1237 IF ctl% AND 16:counttillend%=90
 1238 ENDPROC
 1239 :
 1240 DEF PROCprintonewin(x)
@@ -1366,3 +1366,9 @@
 1366 SYS6,113,1
 1367 SYS6,112,1
 1368 ENDPROC
+1369 :
+1370 DEF PROCreadkeys:REM Pads: 1 left, 2 right, 4 up, 8 down, 16 fire. ctl%: 1 pause, 2 sound off, 4 sound on, 8 quit, 16 skip winner
+1371 pad%(1)=-(INKEY-98)-2*(INKEY-67)-4*(INKEY-68)-8*(INKEY-83)-16*(INKEY-84)
+1372 pad%(2)=-(INKEY-108 OR INKEY-101)-2*(INKEY-125 OR INKEY-86)-4*(INKEY-27 OR INKEY-71)-8*(INKEY-109 OR INKEY-102)-16*(INKEY-59 OR INKEY-87)
+1373 ctl%=-(INKEY-90)-2*(INKEY-17)-4*(INKEY-82)-8*(INKEY-97)-16*(INKEY-99)
+1374 ENDPROC
