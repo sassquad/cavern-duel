@@ -41,7 +41,7 @@
 41 ENDPROC
 42 :
 43 DEF FNuser_menu(window%,icon%,screenx%,screeny%)
-44 return%=0
+44 LOCAL return%:return%=0
 45 CASE window% OF
 46 WHEN bar%:return%=barmenu%
 47 ENDCASE

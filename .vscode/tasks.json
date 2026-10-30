@@ -51,7 +51,7 @@
     },
     {
       "label": "Check sources",
-      "detail": "Tokenise every source and confirm it round-trips",
+      "detail": "Confirm every source round-trips, then lint each program",
       "type": "shell",
       "command": "python3 tools/build.py check",
       "problemMatcher": []

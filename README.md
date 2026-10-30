@@ -13,14 +13,17 @@ More about the game, including the latest release to download, is at
 src/                    BBC BASIC as plain text – edit these
   !CavenDuel/!RunImage.bas
   !CavenDuel/Game.bas
-  !CavenDuel/DrWimp.bas  (DrWimp library, third-party)
   !CavernEd/!RunImage.bas
+  shared/DrWimp.bas     Dr Wimp 5.04 library (third-party), built into
+                        both !CavenDuel and !CavernEd
 app/                    the RISC OS applications, in HostFS format
   !CavenDuel/           the game
   !CavernEd/            the cave editor
 tools/
   bbcbasic.py           tokeniser / detokeniser for BBC BASIC V
   build.py              build, pull, check, deploy
+  lint.py               finds calls to missing routines and variable
+                        clashes with libraries (run by check)
   import_zip.py         unpacks a RISC OS zip into app/ + src/
   test_bbcbasic.py      tokeniser tests
   setup_rpcemu.sh       installs RPCEmu and the Easy Start machines
@@ -65,8 +68,17 @@ If you edit BASIC inside RISC OS (with StrongED, Zap or `EDIT`), run
 **Pull BASIC from app** to bring the changes back into `src/` before
 committing.
 
-Other tasks: **Check sources** (tokenise every file and confirm it
-round-trips) and **Test tokeniser**.
+Other tasks: **Check sources** and **Test tokeniser**. **Check sources**
+confirms every file round-trips, then lints each program against the
+libraries it loads. BASIC only reports a call to a missing routine, or a
+misspelt one, when that line runs, so this catches them before you do.
+Warnings (an identical duplicate routine, or a missing routine called only
+from dead code) don't fail the check.
+
+Dr Wimp is kept once, in `src/shared/`, and built into both apps. If you
+edit it inside RISC OS, make the same change in the other app's copy (or
+copy one over the other) before **Pull**, which refuses to choose between
+two different copies.
 
 ### Source format
 
@@ -95,7 +107,8 @@ work for modern RISC OS 5 machines:
   Raspberry Pi; moving to a 256-colour mode string is the likely fix.
 - **Timing.** Game speed relies on `TIME` busy-waits (e.g. `Game` line
   646), so it varies with machine speed; a fixed frame rate would help.
-- **DrWimp.** The bundled copy dates from 2007; a current release should
-  help `!CavernEd` on RISC OS 5.
+- **Dr Wimp.** Both apps use Dr Wimp 5.04, the latest release. The
+  launcher moved from 4.70 with one change; `!CavernEd`, which had its own
+  1995 desktop code, was rewritten onto Dr Wimp.
 - **Future 64-bit RISC OS.** Rewriting the fader in BASIC would remove the
   only ARM assembler.
