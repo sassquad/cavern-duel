@@ -580,7 +580,7 @@
 580 DEF PROCplay
 581 CLS:FOR I%=0TO15:VDU19,I%,0;0;:NEXT:PROCclearbanks
 582 MOUSE OFF
-583 gapfire=0
+583 gapfire=0:PROCseed(TIME):REM A networked game will seed both machines with the same number
 584 REM Recall pre-positioned objects
 585 FOR obj=1 TO numofobjs
 586 screen$(obj_scx(obj),obj_scy(obj),obj_x(obj),obj_y(obj))=obj_remem$(obj)
@@ -696,7 +696,7 @@
 696 WHEN "wep2":a%=22
 697 WHEN "wep3":a%=23
 698 WHEN "wep4":a%=24
-699 WHEN "4":r%=RND(2)-1:a%=17+r%
+699 WHEN "4":r%=FNrnd(2)-1:a%=17+r%
 700 OTHERWISE:a%=VAL(a$)
 701 ENDCASE
 702 IF a%>19 AND a%<25 OR a%>5 AND a%<16 OR a%=19 THEN
@@ -869,7 +869,7 @@
 869 SOUND4,-15,&1000,100
 870 :
 871 REPEAT
-872 R1%=RND(8)-1:R2%=RND(4)-1:R3%=RND(15):R4%=RND(15)
+872 R1%=FNrnd(8)-1:R2%=FNrnd(4)-1:R3%=FNrnd(15):R4%=FNrnd(15)
 873 UNTIL screen$(R1%,R2%,R3%,R4%)="0" OR screen$(R1%,R2%,R3%,R4%)="5":screenx(player%)=R1%:screeny(player%)=R2%:YOUX(player%)=R3%:YOUY(player%)=R4%
 874 PROCscreen(screenx(player%),screeny(player%),player%):PROCgrab(player%)
 875 ENDPROC
@@ -1211,13 +1211,13 @@
 1211 ENDPROC
 1212 :
 1213 DEF PROCdrawblood_pl1
-1214 SYS46,&122,area%,"gore"+STR$(RND(2)-1),YOUX(1)*64,512+YOUY(1)*32,8
-1215 IF screenx(1)=screenx(2) AND screeny(1)=screeny(2):SYS46,&122,area%,"gore"+STR$(RND(2)-1),YOUX(1)*64,YOUY(1)*32-4,8
+1214 SYS46,&122,area%,"gore"+STR$(FNrnd(2)-1),YOUX(1)*64,512+YOUY(1)*32,8
+1215 IF screenx(1)=screenx(2) AND screeny(1)=screeny(2):SYS46,&122,area%,"gore"+STR$(FNrnd(2)-1),YOUX(1)*64,YOUY(1)*32-4,8
 1216 ENDPROC
 1217 :
 1218 DEF PROCdrawblood_pl2
-1219 SYS46,&122,area%,"gore"+STR$(RND(2)-1),YOUX(2)*64,YOUY(2)*32-4,8
-1220 IF energy(2)>0 AND shield(2)=0 AND screenx(2)=screenx(1) AND screeny(2)=screeny(1):SYS46,&122,area%,"gore"+STR$(RND(2)-1),YOUX(2)*64,512+YOUY(2)*32,8
+1219 SYS46,&122,area%,"gore"+STR$(FNrnd(2)-1),YOUX(2)*64,YOUY(2)*32-4,8
+1220 IF energy(2)>0 AND shield(2)=0 AND screenx(2)=screenx(1) AND screeny(2)=screeny(1):SYS46,&122,area%,"gore"+STR$(FNrnd(2)-1),YOUX(2)*64,512+YOUY(2)*32,8
 1221 ENDPROC
 1222 :
 1223 DEF PROCfindwinner
@@ -1315,7 +1315,7 @@
 1315 DEF PROCplaceobjects
 1316 FOR abcd%=1 TO foodval
 1317 REPEAT
-1318 R1%=RND(8)-1:R2%=RND(4)-1:R3%=RND(15):R4%=RND(15):obj$=STR$(RND(4)-1+11)
+1318 R1%=FNrnd(8)-1:R2%=FNrnd(4)-1:R3%=FNrnd(15):R4%=FNrnd(15):obj$=STR$(FNrnd(4)-1+11)
 1319 UNTIL screen$(R1%,R2%,R3%,R4%)="0"
 1320 screen$(R1%,R2%,R3%,R4%)=obj$
 1321 NEXT
@@ -1323,7 +1323,7 @@
 1323 REM Place shields on map
 1324 FOR abcd%=1 TO shldval
 1325 REPEAT
-1326 R1%=RND(8)-1:R2%=RND(4)-1:R3%=RND(15):R4%=RND(15):obj$="10"
+1326 R1%=FNrnd(8)-1:R2%=FNrnd(4)-1:R3%=FNrnd(15):R4%=FNrnd(15):obj$="10"
 1327 UNTIL screen$(R1%,R2%,R3%,R4%)="0"
 1328 screen$(R1%,R2%,R3%,R4%)=obj$
 1329 NEXT
@@ -1331,7 +1331,7 @@
 1331 REM Place teleporter potions on map.
 1332 FOR abcd%=1 TO televal
 1333 REPEAT
-1334 R1%=RND(8)-1:R2%=RND(4)-1:R3%=RND(15):R4%=RND(15)
+1334 R1%=FNrnd(8)-1:R2%=FNrnd(4)-1:R3%=FNrnd(15):R4%=FNrnd(15)
 1335 UNTIL screen$(R1%,R2%,R3%,R4%)="0"
 1336 screen$(R1%,R2%,R3%,R4%)="15"
 1337 NEXT
@@ -1339,7 +1339,7 @@
 1339 REM Place weapons on map
 1340 FOR abcde%=1 TO weapval
 1341 REPEAT
-1342 R1%=RND(8)-1:R2%=RND(4)-1:R3%=RND(15):R4%=RND(15):obj$="wep"+STR$(RND(5)-1)
+1342 R1%=FNrnd(8)-1:R2%=FNrnd(4)-1:R3%=FNrnd(15):R4%=FNrnd(15):obj$="wep"+STR$(FNrnd(5)-1)
 1343 UNTIL screen$(R1%,R2%,R3%,R4%)="0"
 1344 screen$(R1%,R2%,R3%,R4%)=obj$
 1345 NEXT
@@ -1372,3 +1372,13 @@
 1372 pad%(2)=-(INKEY-108 OR INKEY-101)-2*(INKEY-125 OR INKEY-86)-4*(INKEY-27 OR INKEY-71)-8*(INKEY-109 OR INKEY-102)-16*(INKEY-59 OR INKEY-87)
 1373 ctl%=-(INKEY-90)-2*(INKEY-17)-4*(INKEY-82)-8*(INKEY-97)-16*(INKEY-99)
 1374 ENDPROC
+1375 :
+1376 DEF PROCseed(s%):REM The game's own random numbers: the same seed always gives the same game, unlike RND
+1377 rnd%=s%:IF rnd%=0 THEN rnd%=1
+1378 ENDPROC
+1379 :
+1380 DEF FNrnd(n%):REM 1 to n%, like RND(n%), from a xorshift generator
+1381 rnd%=rnd% EOR (rnd%<<13)
+1382 rnd%=rnd% EOR (rnd%>>>17)
+1383 rnd%=rnd% EOR (rnd%<<5)
+1384 =(rnd%>>>1) MOD n%+1
