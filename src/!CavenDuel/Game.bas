@@ -6,7 +6,7 @@
 6 REM See documentation for contact details
 7 version$="Version 1.271 (26th February 2011)"
 8 ON ERROR MODE12:SYS "Hourglass_Off":REPORT:PRINT" at line ";ERL:IF GET:PROCtidy:END
-9 SYS "OS_Byte",229,1: REM Disable Escape
+9 LIBRARY "<CavenDuel$Dir>.Net":PROCnet_init:SYS "OS_Byte",229,1: REM Load network play, disable Escape
 10 PROCarrays
 11 PROCinitgrab
 12 PROCinitfader
@@ -376,7 +376,7 @@
 376 ENDPROC
 377 :
 378 DEF PROCmouse
-379 IF screen=1 AND INKEY-99:CALL fade:PROCclearbanks2:PROCplay:CALL fade:PROCclearbanks:PROCmenu:ENDPROC
+379 IF screen=1 AND INKEY-99:PROCstartgame:ENDPROC
 380 LOCAL MX%,MY%,but%
 381 MOUSE MX%,MY%,but%
 382 IF but%=0 THEN ENDPROC
@@ -394,7 +394,7 @@
 394 IF weap GCOL15:RECTANGLE FILL424,512,200,48:weapval+=step:PROCcheckvals:PROCshadow(STR$(weapval),424,552,12,8)
 395 IF tran GCOL15:RECTANGLE FILL656,712,200,48:televal+=step:PROCcheckvals:PROCshadow(STR$(televal),656,752,12,8)
 396 IF shld GCOL15:RECTANGLE FILL656,512,200,48:shldval+=step:PROCcheckvals:PROCshadow(STR$(shldval),656,552,12,8)
-397 IF play CALL fade:PROCclearbanks2:PROCplay:CALL fade:PROCclearbanks:PROCmenu:ENDPROC
+397 IF play PROCstartgame:ENDPROC
 398 IF help CALL fade:PROCinstruct:CALL fade:PROCclearbanks:PROCmenu:ENDPROC
 399 IF new CALL fade:PROCloadnewcaves:CALL fade:PROCclearbanks:PROCmenu:ENDPROC
 400 IF quit CALL fade:PROCquit:ENDPROC
@@ -571,7 +571,7 @@
 571 :
 572 DEF PROCtidy
 573 CALL fade
-574 SYS "Hourglass_Off":
+574 SYS "Hourglass_Off":PROCnet_close
 575 MOUSE OFF:VDU26:COLOUR128:CLS
 576 SYS "OS_Byte",15,0
 577 VDU 20
@@ -580,7 +580,7 @@
 580 DEF PROCplay
 581 CLS:FOR I%=0TO15:VDU19,I%,0;0;:NEXT:PROCclearbanks
 582 MOUSE OFF
-583 gapfire=0:PROCseed(TIME):REM A networked game will seed both machines with the same number
+583 gapfire=0:PROCseed(FNnet_seed):REM A network game seeds both machines with the same number
 584 REM Recall pre-positioned objects
 585 FOR obj=1 TO numofobjs
 586 screen$(obj_scx(obj),obj_scy(obj),obj_x(obj),obj_y(obj))=obj_remem$(obj)
@@ -1371,14 +1371,40 @@
 1371 pad%(1)=-(INKEY-98)-2*(INKEY-67)-4*(INKEY-68)-8*(INKEY-83)-16*(INKEY-84)
 1372 pad%(2)=-(INKEY-108 OR INKEY-101)-2*(INKEY-125 OR INKEY-86)-4*(INKEY-27 OR INKEY-71)-8*(INKEY-109 OR INKEY-102)-16*(INKEY-59 OR INKEY-87)
 1373 ctl%=-(INKEY-90)-2*(INKEY-17)-4*(INKEY-82)-8*(INKEY-97)-16*(INKEY-99)
-1374 ENDPROC
-1375 :
-1376 DEF PROCseed(s%):REM The game's own random numbers: the same seed always gives the same game, unlike RND
-1377 rnd%=s%:IF rnd%=0 THEN rnd%=1
-1378 ENDPROC
-1379 :
-1380 DEF FNrnd(n%):REM 1 to n%, like RND(n%), from a xorshift generator
-1381 rnd%=rnd% EOR (rnd%<<13)
-1382 rnd%=rnd% EOR (rnd%>>>17)
-1383 rnd%=rnd% EOR (rnd%<<5)
-1384 =(rnd%>>>1) MOD n%+1
+1374 IF FNnet_player THEN PROCnetkeys
+1375 ENDPROC
+1376 :
+1377 DEF PROCnetkeys:REM This machine plays one side, on either set of keys; the other machine sends the other side's
+1378 LOCAL me%,them%,p%
+1379 p%=FNnet_player
+1380 me%=pad%(1) OR pad%(2) OR (ctl% AND 24)<<2
+1381 PROCnet_swap(me%,FNstatecheck,them%)
+1382 pad%(p%)=me% AND 31:pad%(3-p%)=them% AND 31
+1383 ctl%=(ctl% AND 6) OR ((me% OR them%)>>2 AND 24):REM Sound stays on this machine; pause is off, as it would stop the other player too
+1384 IF FNnet_lost THEN ctl%=ctl% OR 8
+1385 ENDPROC
+1386 :
+1387 DEF FNstatecheck:REM 1 to 128 from the game's state, which both machines in a network game must agree on every frame
+1388 =(((rnd% AND 255)+YOUX(1)+3*YOUY(1)+5*YOUX(2)+7*YOUY(2)+11*screenx(1)+13*screeny(1)+17*screenx(2)+19*screeny(2)+23*INT(energy(1))+29*INT(energy(2))) AND 127)+1
+1389 :
+1390 DEF PROCseed(s%):REM The game's own random numbers: the same seed always gives the same game, unlike RND
+1391 rnd%=s%:IF rnd%=0 THEN rnd%=1
+1392 ENDPROC
+1393 :
+1394 DEF FNrnd(n%):REM 1 to n%, like RND(n%), from a xorshift generator
+1395 rnd%=rnd% EOR (rnd%<<13)
+1396 rnd%=rnd% EOR (rnd%>>>17)
+1397 rnd%=rnd% EOR (rnd%<<5)
+1398 =(rnd%>>>1) MOD n%+1
+1399 :
+1400 DEF PROCstartgame:REM From the menu: connect first if this is a network game, then play
+1401 LOCAL x%,y%,b%
+1402 IF FNnet_connect(TIME)=FALSE THEN PROCuser_netstatus(FNnet_why):REPEAT:MOUSE x%,y%,b%:UNTIL b%=0 AND INKEY-99=0:ENDPROC
+1403 CALL fade:PROCclearbanks2:PROCplay:CALL fade:PROCclearbanks:PROCmenu
+1404 IF FNnet_lost THEN PROCuser_netstatus(FNnet_why)
+1405 PROCnet_close
+1406 ENDPROC
+1407 :
+1408 DEF PROCuser_netstatus(text$):REM Network messages go in a strip along the bottom of the menu
+1409 GCOL7:RECTANGLE FILL0,0,1280,112:PROCsize(8,8):PROCshadow(text$,640-LEN(text$)*8,72,0,0):PROCsize(32,8):REM Back to the size the menu draws its numbers in
+1410 ENDPROC
