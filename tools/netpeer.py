@@ -4,20 +4,22 @@
     netpeer.py relay [--port 30123]
         Wait for two copies of the game to connect, then pass everything
         between them. For machines that can't accept connections, such as
-        two RPCEmu machines: set CavernDuel$Net to "host 100.64.0.1"
-        on one and "join 100.64.0.1" on the other.
+        two RPCEmu machines: on one, set CavernDuel$Relay to 100.64.0.1 and
+        click Host; on the other, click Join and type 100.64.0.1.
 
     netpeer.py host [address[:port]] [--port 30123] [--frames N]
     netpeer.py join address[:port] [--frames N]
         Play against one copy of the game with a pretend opponent that
         wanders about and fires now and then, printing what the game sends.
-        "host" with no address waits for the game to connect (set
-        CavernDuel$Net to "join 100.64.0.1" in RPCEmu); with an address it
-        connects out, to a relay or to a game behind a port forward.
+        "host" with no address waits for the game to connect (click Join and
+        type 100.64.0.1 in RPCEmu); with an address it connects out, to a relay
+        or to a game behind a port forward. It sends the Default cave and the
+        menu's starting settings.
 
 The protocol is described at the top of src/!CavenDuel/Net.bas.
 """
 import argparse
+import os
 import random
 import select
 import socket
@@ -25,8 +27,10 @@ import struct
 import sys
 
 PORT = 30123
-VERSION = 1
+VERSION = 2
 DELAY = 2  # frames; must match net_delay% in Net.bas
+CAVE = os.path.join(os.path.dirname(__file__), "..", "app", "!CavenDuel", "Screens", "Default,022")
+SETTINGS = (50, 20, 5, 10)  # food, weapons, teleports, shields
 NAMES = ["left", "right", "up", "down", "fire", "quit", "skip"]
 
 
@@ -72,11 +76,28 @@ def relay(port):
     print(f"relay waiting on port {port}", flush=True)
     while True:
         a = accept(server)
+        held = b""  # what the first player sends before the second arrives
+        while True:
+            ready, _, _ = select.select([a, server], [], [])
+            if a in ready:
+                try:
+                    data = a.recv(4096)
+                except OSError:
+                    data = b""
+                if not data:  # they gave up: don't pair the next player with them
+                    print("the first player left; waiting again", flush=True)
+                    a.close()
+                    a = accept(server)
+                    held = b""
+                held += data
+            elif server in ready:
+                break
         b = accept(server)
         print("passing the game between them", flush=True)
-        sent = {a: 0, b: 0}
+        sent = {a: len(held), b: 0}
         other = {a: b, b: a}
         try:
+            b.sendall(held)
             while True:
                 ready, _, _ = select.select([a, b], [], [])
                 data = b""
@@ -117,6 +138,15 @@ def opponent(role, conn, frames):
     if player == 2:
         seed = struct.unpack("<I", hello[4:8])[0]
     print(f"playing as player {player}, seed {seed}", flush=True)
+    if player == 1:
+        with open(CAVE, "rb") as f:
+            cave = f.read()
+        conn.sendall(struct.pack("<5I", len(cave), *SETTINGS) + cave)
+    else:
+        head = recv_exact(conn, 20)
+        if not head or recv_exact(conn, struct.unpack("<I", head[:4])[0]) is None:
+            sys.exit("the game closed the connection before sending its cave")
+        print("settings from the game: food {}, weapons {}, teleports {}, shields {}".format(*struct.unpack("<4I", head[4:])), flush=True)
     conn.sendall(bytes(2 * DELAY))
 
     rng = random.Random(seed)

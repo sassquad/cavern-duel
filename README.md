@@ -1,6 +1,6 @@
 # Cavern Duel
 
-A two-player maze game for RISC OS, by Graeme and Stephen Scott (1994–2011).
+A two-player maze game for RISC OS, by Graeme and Stephen Scott (1994–2026).
 This repository is set up for development in VS Code on a Mac, testing under
 RPCEmu and on real RISC OS 5 hardware.
 
