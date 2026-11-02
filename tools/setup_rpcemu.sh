@@ -1,24 +1,27 @@
 #!/bin/bash
-# Install RPCEmu for macOS plus the RISC OS 5 (Direct) and RISC OS 3.71
-# Easy Start bundles, with this project's app/ folder mapped as a HostFS drive.
+# Install RPCEmu Extended for macOS plus RISC OS 5 (Direct) and RISC OS 3.71
+# machines made from the Easy Start bundles, with this project's app/ folder
+# as the Shared drive that every machine sees.
 #
-#   tools/setup_rpcemu.sh [install-dir]      (default: ~/RPCEmu)
+#   tools/setup_rpcemu.sh [data-dir]      (default: ~/RPCEmu-Extended)
 #
-# Safe to re-run: downloads are cached in <install-dir>/Downloads and existing
-# machines are left alone (delete a machine's folder to rebuild it).
+# Safe to re-run: downloads are cached in <data-dir>/Downloads and existing
+# machines are left alone (delete a machine's folders to rebuild it).
 set -euo pipefail
 
-ROOT="${1:-$HOME/RPCEmu}"
+ROOT="${1:-$HOME/RPCEmu-Extended}"
 PROJECT_APP="$(cd "$(dirname "$0")/.." && pwd)/app"
 DOWNLOADS="$ROOT/Downloads"
+APP="$HOME/Applications/RPCEmu-Extended.app"
 
-RPCEMU_VERSION="0.9.5b"
-RPCEMU_URL="https://github.com/Septercius/rpcemu-dev/releases/download/$RPCEMU_VERSION/RPCEmu-$RPCEMU_VERSION-Release.zip"
+RPCEMU_VERSION="2.0.0"
+RPCEMU_FILE="rpcemu_${RPCEMU_VERSION}_macos_universal.tar.gz"
+RPCEMU_URL="https://github.com/andrewtimmins/rpcemu-extended/releases/download/v$RPCEMU_VERSION/$RPCEMU_FILE"
 # Easy Start "Other platforms" editions, from http://www.marutan.net/rpcemu/easystart.html
 DIRECT_ID="1uIAUIB8wuixm2-49bXQSvnLjdeN8ePaz"
 RO371_ID="1HWd67HYNRsIh9wgQZZT06GsANlYd4V4i"
 
-fetch() {  # url file
+fetch() {  # url file test-command
     if [ -s "$2" ]; then
         echo "Already downloaded: $(basename "$2")"
     else
@@ -27,9 +30,9 @@ fetch() {  # url file
         mv "$2.part" "$2"
     fi
     # Google Drive answers with an HTML page when it refuses a download
-    if ! unzip -tqq "$2" >/dev/null 2>&1; then
+    if ! $3 "$2" >/dev/null 2>&1; then
         rm -f "$2"
-        echo "$(basename "$2") is not a valid zip. Download it in a browser" >&2
+        echo "$(basename "$2") is not a valid archive. Download it in a browser" >&2
         echo "and save it as $2, then run this script again." >&2
         exit 1
     fi
@@ -39,96 +42,96 @@ drive_url() {
     echo "https://drive.usercontent.google.com/download?id=$1&export=download&confirm=t"
 }
 
-mkdir -p "$DOWNLOADS"
-fetch "$RPCEMU_URL" "$DOWNLOADS/RPCEmu-$RPCEMU_VERSION.zip"
-fetch "$(drive_url "$DIRECT_ID")" "$DOWNLOADS/EasyStart-Direct.zip"
-fetch "$(drive_url "$RO371_ID")" "$DOWNLOADS/EasyStart-371.zip"
+mkdir -p "$DOWNLOADS" "$ROOT/configs" "$ROOT/machines" "$ROOT/roms"
+fetch "$RPCEMU_URL" "$DOWNLOADS/$RPCEMU_FILE" "tar tzf"
+fetch "$(drive_url "$DIRECT_ID")" "$DOWNLOADS/EasyStart-Direct.zip" "unzip -tqq"
+fetch "$(drive_url "$RO371_ID")" "$DOWNLOADS/EasyStart-371.zip" "unzip -tqq"
 
-# The emulator itself, plus a template "Data" folder
-STAGE="$DOWNLOADS/rpcemu-$RPCEMU_VERSION"
-if [ ! -d "$STAGE" ]; then
-    unzip -q "$DOWNLOADS/RPCEmu-$RPCEMU_VERSION.zip" -d "$STAGE"
-fi
+# The emulator itself, unpacked afresh every run so a new version takes effect
 mkdir -p "$HOME/Applications"
-rm -rf "$HOME/Applications/RPCEmu-Interpreter.app"
-cp -R "$STAGE/RPCEmu-Interpreter.app" "$HOME/Applications/"
+rm -rf "$APP"
+UNPACK="$(mktemp -d "$DOWNLOADS/unpack.XXXXXX")"
+tar xzf "$DOWNLOADS/$RPCEMU_FILE" -C "$UNPACK"
+mv "$UNPACK/RPCEmu.app" "$APP"
+rm -rf "$UNPACK"
 # The app is not notarised, so macOS would refuse to open it
-xattr -dr com.apple.quarantine "$HOME/Applications/RPCEmu-Interpreter.app"
-echo "Installed ~/Applications/RPCEmu-Interpreter.app"
+xattr -dr com.apple.quarantine "$APP"
+echo "Installed ~/Applications/RPCEmu-Extended.app"
 
-make_machine() {  # name bundle-zip
-    local dest="$ROOT/$1" bundle="$2"
-    if [ -d "$dest" ]; then
-        echo "Keeping existing $dest"
+# The Shared drive is the project, so a build shows up straight away
+if [ -L "$ROOT/shared" ]; then
+    rm "$ROOT/shared"
+elif [ -e "$ROOT/shared" ]; then
+    echo "$ROOT/shared exists and isn't a link; move it and run this again" >&2
+    exit 1
+fi
+ln -s "$PROJECT_APP" "$ROOT/shared"
+
+make_machine() {  # name description bundle-zip
+    local name="$1" machine="$ROOT/machines/$1"
+    if [ -d "$machine" ]; then
+        echo "Keeping existing machine $name"
         return
     fi
-    echo "Creating $dest..."
+    echo "Creating machine $name..."
     # Build in a scratch folder and only move it into place once complete,
     # so a failed run never leaves a half-made machine behind
-    local work="$dest.partial"
+    local work="$ROOT/machines/.$name.partial"
     rm -rf "$work"
     trap 'rm -rf "$work"' EXIT
-    mkdir -p "$work/bundle"
+    mkdir -p "$work/bundle" "$work/machine"
     # ditto, not unzip: some bundle filenames use the RISC OS character set,
     # which macOS rejects unless the names are converted
-    ditto -x -k "$bundle" "$work/bundle"
+    ditto -x -k "$3" "$work/bundle"
     # The bundle unpacks to a single "RPCEmu - ..." folder
     local top
     top="$(find "$work/bundle" -mindepth 1 -maxdepth 1 -type d | head -1)"
     if [ -z "$top" ] || [ ! -d "$top/roms" ] || [ ! -d "$top/hostfs" ]; then
-        echo "$(basename "$bundle") doesn't look like an Easy Start bundle" >&2
+        echo "$(basename "$3") doesn't look like an Easy Start bundle" >&2
         echo "(expected one folder holding roms/ and hostfs/)." >&2
         exit 1
     fi
+    mv "$top/hostfs" "$top/cmos.ram" "$work/machine/"
 
-    cp -R "$STAGE/Data" "$work/machine"
-    cp -R "$top/." "$work/machine/"
-    rm -rf "$work/bundle"
-    # Multi-drive HostFS needs its own podule ROMs, not the single-drive ones
-    rm -f "$work/machine/poduleroms/hostfs,ffa" \
-          "$work/machine/poduleroms/hostfsfiler,ffa"
-    cp "$STAGE/Data/poduleroms/multihostfs,ffa" \
-       "$STAGE/Data/poduleroms/multihostfsfiler,ffa" "$work/machine/poduleroms/"
-    # Multi-drive HostFS boots from the drive in CMOS logical &50
-    # (*Configure HostFSDrive), which the bundles leave at 0, so RISC OS
-    # stops at the * prompt. Point it at drive 4, the machine's hard disc.
-    # cmos.ram is stored by physical address (logical + &40); RPCEmu fixes
-    # the checksum when it loads the file.
-    printf '\x04' | dd of="$work/machine/cmos.ram" bs=1 seek=$((0x90)) \
-        conv=notrunc 2>/dev/null
+    # RISC OS 5 asks for its address by DHCP. RISC OS 3.71 can't, and the
+    # bundle gives it one on the old emulator's network: move it to this one.
+    # It has no default route, but the host is on the same network as it.
+    local inet="$work/machine/hostfs/!Boot/Choices/Internet"
+    if grep -q '10\.10\.10\.10' "$inet/Startup,feb"; then
+        sed -i '' -e 's/10\.10\.10\.10/100.64.0.10/g' \
+                  -e 's/10\.10\.10\.3/100.64.0.2/g' \
+                  -e 's/255\.255\.255\.0/255.192.0.0/g' "$inet/Startup,feb"
+    fi
 
-    # Keep the bundle's settings, but use two-button mouse mode (right click
-    # = Menu, which suits a Mac) and add the project as HostFS drive 2.
-    local cfg="$work/machine/rpc.cfg"
-    awk '/^\[/ { skip = ($0 == "[HostFS]") } !skip' "$cfg" \
-        | sed 's/^mouse_twobutton=.*/mouse_twobutton=1/' > "$cfg.new"
-    cat >> "$cfg.new" <<EOF
+    # When the desktop starts, the emulator's RPCEmuMonitor module on RISC OS 3
+    # replaces the monitor file !Boot chose with its own, which has no 640x256,
+    # so MODE 12 becomes 640x480. Boot tasks run after that: load !Boot's again.
+    if [ "$name" = ro371 ]; then
+        echo "LoadModeFile BootResources:Configure.Monitors.EmuMon" \
+            > "$work/machine/hostfs/!Boot/Choices/Boot/Tasks/EmuMon,feb"
+    fi
 
-[HostFS]
-1\\boot_option=2
-1\\enabled=1
-1\\name=HostFS
-1\\path=./hostfs
-2\\boot_option=0
-2\\enabled=1
-2\\name=CavernDuel
-2\\path=$PROJECT_APP
-3\\enabled=0
-4\\enabled=0
-size=4
-EOF
-    mv "$cfg.new" "$cfg"
+    # Keep the machine the bundle describes, with two-button mouse mode (right
+    # click = Menu, which suits a Mac) and networking on
+    {
+        echo "[General]"
+        echo "description=$2"
+        grep -E '^(model|mem_size|vram_size)=' "$top/rpc.cfg"
+        echo "rom_dir=$name"
+        echo "network_type=nat"
+        echo "mouse_twobutton=1"
+        echo "sound_enabled=1"
+    } > "$ROOT/configs/$name.cfg"
 
-    mv "$work/machine" "$dest"
+    rm -rf "$ROOT/roms/$name"
+    mv "$top/roms" "$ROOT/roms/$name"
+    mv "$work/machine" "$machine"
     rm -rf "$work"
     trap - EXIT
 }
 
-make_machine "Direct" "$DOWNLOADS/EasyStart-Direct.zip"
-make_machine "RO371" "$DOWNLOADS/EasyStart-371.zip"
+make_machine direct "RISC OS 5" "$DOWNLOADS/EasyStart-Direct.zip"
+make_machine ro371 "RISC OS 3.71" "$DOWNLOADS/EasyStart-371.zip"
 
 echo
-echo "Done. Start a machine with:"
-echo "  tools/rpcemu.sh direct    (RISC OS 5)"
-echo "  tools/rpcemu.sh 371       (RISC OS 3.71)"
-echo "You can delete $DOWNLOADS to free about 1.4 GB."
+echo "Done. Start a machine with:  tools/rpcemu.sh direct   or   tools/rpcemu.sh 371"
