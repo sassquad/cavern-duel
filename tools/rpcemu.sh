@@ -1,27 +1,22 @@
 #!/bin/bash
-# Start RPCEmu with one of the machines made by setup_rpcemu.sh.
+# Start RPCEmu Extended with one of the machines made by setup_rpcemu.sh.
 #
-#   tools/rpcemu.sh direct|371 [install-dir]      (default: ~/RPCEmu)
+#   tools/rpcemu.sh direct|371 [data-dir]      (default: ~/RPCEmu-Extended)
 #
-# The macOS build remembers a single data folder, so this points it at the
-# chosen machine before launching. Quit RPCEmu before switching machines.
+# Each machine gets its own window and process, so both can run at once.
 set -euo pipefail
 
-ROOT="${2:-$HOME/RPCEmu}"
+ROOT="${2:-$HOME/RPCEmu-Extended}"
+APP="$HOME/Applications/RPCEmu-Extended.app"
 case "${1:-}" in
-    direct) MACHINE="$ROOT/Direct" ;;
-    371)    MACHINE="$ROOT/RO371" ;;
-    *)      echo "usage: $0 direct|371 [install-dir]" >&2; exit 2 ;;
+    direct) MACHINE="direct" ;;
+    371)    MACHINE="ro371" ;;
+    *)      echo "usage: $0 direct|371 [data-dir]" >&2; exit 2 ;;
 esac
 
-if [ ! -f "$MACHINE/rpc.cfg" ]; then
-    echo "$MACHINE not found; run tools/setup_rpcemu.sh first" >&2
-    exit 1
-fi
-if pgrep -xq RPCEmu-Interpreter; then
-    echo "RPCEmu is already running; quit it first (File > Exit)" >&2
+if [ ! -f "$ROOT/configs/$MACHINE.cfg" ] || [ ! -d "$APP" ]; then
+    echo "$MACHINE not found in $ROOT; run tools/setup_rpcemu.sh first" >&2
     exit 1
 fi
 
-defaults write org.marutan.rpcemu DataDirectory "$MACHINE"
-open "$HOME/Applications/RPCEmu-Interpreter.app"
+open -n "$APP" --args --datadir "$ROOT" --machine "$MACHINE"

@@ -9,11 +9,15 @@
                       then lint each program against its libraries
     build.py deploy   build, then copy app/ into the HostFS folder named in
                       deploy.local.json ({"hostfs": "/path/to/rpcemu/hostfs/CavernDuel"})
+    build.py release  build, then make dist/CavernDuel.zip to unpack on RISC OS
 """
 import json
 import os
 import shutil
+import struct
 import sys
+import time
+import zipfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import bbcbasic  # noqa: E402
@@ -32,9 +36,13 @@ SHARED = {
 # Programs and the libraries they load with LIBRARY, for lint
 PROGRAMS = {
     "!CavenDuel/!RunImage": ["shared/DrWimp"],
-    "!CavenDuel/Game": [],
+    "!CavenDuel/Game": ["!CavenDuel/Net"],
     "!CavernEd/!RunImage": ["shared/DrWimp"],
 }
+
+# What goes in the release zip
+RELEASE = ["!CavenDuel", "!CavernEd"]
+README = os.path.join(ROOT, "docs", "release-readme.txt")
 
 
 def targets(rel):
@@ -158,8 +166,46 @@ def deploy():
     return 0
 
 
+def add_to_zip(archive, path, name, filetype):
+    """Add a file with the Acorn extra field that gives RISC OS its file type,
+    date and access; the name in the zip has no ,xxx on the end."""
+    mtime = int(os.path.getmtime(path))
+    info = zipfile.ZipInfo(name, time.localtime(mtime)[:6])
+    info.compress_type = zipfile.ZIP_DEFLATED
+    info.create_system = 13  # Acorn
+    stamp = (mtime + 2208988800) * 100  # centiseconds since 1900
+    load = 0xFFF00000 | filetype << 8 | stamp >> 32
+    info.extra = struct.pack("<HH4sIIII", 0x4341, 20, b"ARC0", load,
+                             stamp & 0xFFFFFFFF, 0x33, 0)
+    archive.writestr(info, read_bytes(path))
+
+
+def release():
+    if build():
+        return 1
+    out = os.path.join(ROOT, "dist", "CavernDuel.zip")
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    with zipfile.ZipFile(out, "w") as archive:
+        add_to_zip(archive, README, "ReadMe", 0xFFF)
+        for app in RELEASE:
+            for dirpath, dirs, files in os.walk(os.path.join(APP, app)):
+                dirs.sort()
+                for filename in sorted(files):
+                    if filename.startswith("."):
+                        continue
+                    path = os.path.join(dirpath, filename)
+                    name, _, filetype = os.path.relpath(path, APP).rpartition(",")
+                    if not name:
+                        print(f"{os.path.relpath(path, ROOT)}: error: no ,xxx file type")
+                        return 1
+                    add_to_zip(archive, path, name, int(filetype, 16))
+    print(f"made {os.path.relpath(out, ROOT)}")
+    return 0
+
+
 def main(argv):
-    commands = {"build": build, "pull": pull, "check": check, "deploy": deploy}
+    commands = {"build": build, "pull": pull, "check": check, "deploy": deploy,
+                "release": release}
     if len(argv) != 2 or argv[1] not in commands:
         print(__doc__, file=sys.stderr)
         return 2

@@ -7,7 +7,7 @@
 <body>
 <h2>Cavern Duel</h2>
 <p>Version 1.271 (26th February, 2011) </p>
-<p>By Graeme and Stephen Scott &copy; 1994-2011. <br />
+<p>By Graeme and Stephen Scott &copy; 1994-2026. <br />
   WIMP front end by <a href="http://www.rayfavre.me.uk/drwimp.html" target="_blank">Dr Wimp 4.70</a>.</p>
   <p>This game is dedicated to Mary Scott (1944 - 2010), who always enjoyed playing JCB Digger, Spectapede, Strike Force Harrier, and many other games, too numerous to mention. A wonderful mum, sadly missed.</p>
 <h3><a name="toc" id="toc"></a>Table of contents</h3>
@@ -18,6 +18,7 @@
   <li><a href="#loading_the_game">Loading the game</a></li>
   <li><a href="#playing_the_game">Playing the game</a></li>
   <li><a href="#game_controls">Game controls</a></li>
+  <li><a href="#network_play">Playing over a network</a></li>
   <li><a href="#hints_tips">Hints &amp; tips</a></li>
   <li><a href="#loading_new_cavefiles">Loading new Cavefiles </a></li>
   <li><a href="#compatibility">Compatibility</a></li>
@@ -171,6 +172,13 @@
 </ul>
 <p>Note that the current game is reset when you return to the
   main menu, so don't use it unless you <strong>have</strong> to! <a href="#toc"><em>Back to top</em></a></p>
+<h3><a name="network_play" id="network_play"></a>Playing over a network </h3>
+<p>Two players can each play on their own machine, connected over a network. The game needs the Internet module to be running on both machines.</p>
+<ol>
+  <li>One player chooses the settings and cave, then clicks <strong>Host</strong>. Their address appears along the bottom of the menu.</li>
+  <li>The other player clicks <strong>Join</strong>, types that address and presses Return.</li>
+</ol>
+<p>The game starts on both machines with the host's settings and cave. The host plays Player 1 and the other player plays Player 2, on either set of keys; a message before the game says which you are. Tab cancels while connecting and ends the game for both players. Pause is switched off in a network game.</p>
 <h3><a name="hints_tips" id="hints_tips"></a>Hints &amp; tips </h3>
 <p>The following hints and tips may be useful to you during the
   game: </p>
@@ -421,7 +429,7 @@
 <h3><a name="contacting_us" id="contacting_us"></a>Contacting us </h3>
 <p>Visit the dedicated Cavern Duel page at <a href="https://www.sassquad.net/cavernduel">www.sassquad.net/cavernduel</a> for the latest news on the
   game. <a href="#toc"><em>Back to top</em></a></p>
-<p><em>&copy; Stephen Scott 2007,2011. Document last updated 26th February, 2011.</em></p>
+<p><em>&copy; Stephen Scott 2007,2026. Document last updated 26th February, 2011.</em></p>
 <p>Page markup by <a href="http://www.adobe.com/dreamweaver" target="_blank">Adobe Dreamweaver CS3, StrongEd</a>. XHTML 1.1 Transitional. RISC OS Browsers of choice: <a href="http://netsurf.sourceforge.net/" target="_blank">Netsurf</a>, <a href="http://www.riscos.info/unix/firefox/" target="_blank">Firefox</a>, <a href="http://www.oreganouk.net/oregano2.html" target="_blank">Oregano</a> </p>
 </body>
 </html>

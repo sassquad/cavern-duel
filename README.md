@@ -1,6 +1,6 @@
 # Cavern Duel
 
-A two-player maze game for RISC OS, by Graeme and Stephen Scott (1994–2011).
+A two-player maze game for RISC OS, by Graeme and Stephen Scott (1994–2026).
 This repository is set up for development in VS Code on a Mac, testing under
 RPCEmu and on real RISC OS 5 hardware.
 
@@ -13,6 +13,7 @@ More about the game, including the latest release to download, is at
 src/                    BBC BASIC as plain text – edit these
   !CavenDuel/!RunImage.bas
   !CavenDuel/Game.bas
+  !CavenDuel/Net.bas    network play, loaded by Game
   !CavernEd/!RunImage.bas
   shared/DrWimp.bas     Dr Wimp 5.04 library (third-party), built into
                         both !CavenDuel and !CavernEd
@@ -26,9 +27,11 @@ tools/
                         clashes with libraries (run by check)
   import_zip.py         unpacks a RISC OS zip into app/ + src/
   test_bbcbasic.py      tokeniser tests
-  setup_rpcemu.sh       installs RPCEmu and the Easy Start machines
-  rpcemu.sh             starts RPCEmu on RISC OS 5 or 3.71
-docs/rpcemu-setup.md    RPCEmu installation guide
+  netpeer.py            pretend player and relay for testing network play
+  setup_rpcemu.sh       installs RPCEmu Extended and the two machines
+  rpcemu.sh             starts a machine on RISC OS 5 or 3.71
+docs/rpcemu-setup.md    RPCEmu Extended installation guide
+docs/network-play.md    network play: how it works and how to test it
 reference/              the original v1.271 release zip
 ```
 
@@ -44,15 +47,16 @@ The application folder really is called `!CavenDuel` (no "r"); `!Run` and
 
 1. Install Python 3 (the Xcode command line tools' `python3` is fine) and
    VS Code. Optionally add a BBC BASIC syntax extension from the Marketplace.
-2. Install RPCEmu with a RISC OS 5 and a RISC OS 3.71 machine, each of which
-   sees `app/` as a disc called **CavernDuel**:
+2. Install [RPCEmu Extended](https://github.com/andrewtimmins/rpcemu-extended)
+   with a RISC OS 5 and a RISC OS 3.71 machine, each of which sees `app/` as
+   its **Shared** disc:
 
    ```bash
    tools/setup_rpcemu.sh
    ```
 
-   [docs/rpcemu-setup.md](docs/rpcemu-setup.md) explains each step, the
-   by-hand route, and troubleshooting.
+   [docs/rpcemu-setup.md](docs/rpcemu-setup.md) explains each step and
+   troubleshooting.
 3. Run the **Build** task once (⇧⌘B) to create the `,ffb` files.
 
 ## Everyday workflow
@@ -61,12 +65,16 @@ The application folder really is called `!CavenDuel` (no "r"); `!Run` and
 2. ⇧⌘B (**Build**). Errors such as an over-long line appear in the
    Problems panel.
 3. Run the **Run on RISC OS 5** (or **3.71**) task, or start RPCEmu with
-   `tools/rpcemu.sh direct`. Open the **CavernDuel** disc from the icon bar
+   `tools/rpcemu.sh direct`. Open the **Shared** disc from the icon bar
    and double-click `!CavenDuel`.
 
 If you edit BASIC inside RISC OS (with StrongED, Zap or `EDIT`), run
 **Pull BASIC from app** to bring the changes back into `src/` before
 committing.
+
+To give the game to someone, run the **Make release zip** task. It builds
+`dist/CavernDuel.zip`, with `docs/release-readme.txt` as its ReadMe. Unpack it
+on RISC OS, where the zip's file types are restored.
 
 Other tasks: **Check sources** and **Test tokeniser**. **Check sources**
 confirms every file round-trips, then lints each program against the

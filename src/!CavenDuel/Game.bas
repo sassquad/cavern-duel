@@ -2,11 +2,11 @@
 2 REM Cavern Duel
 3 REM Version 1.271 (26th February 2011)
 4 REM Copyright held by authors. Distribute freely, but do not alter any internal files!
-5 REM Written by Graeme and Stephen Scott © 1994-2011
+5 REM Written by Graeme and Stephen Scott © 1994-2026
 6 REM See documentation for contact details
 7 version$="Version 1.271 (26th February 2011)"
 8 ON ERROR MODE12:SYS "Hourglass_Off":REPORT:PRINT" at line ";ERL:IF GET:PROCtidy:END
-9 SYS "OS_Byte",229,1: REM Disable Escape
+9 LIBRARY "<CavenDuel$Dir>.Net":PROCnet_init:SYS "OS_Byte",229,1: REM Load network play, disable Escape
 10 PROCarrays
 11 PROCinitgrab
 12 PROCinitfader
@@ -26,7 +26,7 @@
 26 END
 27 :
 28 DEF PROCarrays
-29 DIM block% 64,scale% 15
+29 DIM block% 64,scale% 15,cave% 16404:cavesize%=16384
 30 DIM fname$(25)
 31 DIM screen$(7,3,16,16)
 32 DIM YOUX(2),YOUY(2),pad%(2)
@@ -194,7 +194,7 @@
 194 MOUSE OFF
 195 SYS 46,&122,sprites%,"title",0,0,0
 196 COLOUR135:COLOUR11:OFF
-197 PRINT TAB(23,24)"© Graeme & Stephen Scott 1994-2011.":PRINT TAB(24,30);version$
+197 PRINT TAB(23,24)"© Graeme & Stephen Scott 1994-2026.":PRINT TAB(24,30);version$
 198 PROCloadsprites("CavenDuel:Graphics.GameSprs")
 199 PROCloadscreens("<Game$Path>")
 200 VOICES 8:CALL fade:PROCclearbanks
@@ -349,8 +349,7 @@
 349 PROCshadow("     Q - Sound off",400,284,0,4)
 350 PROCshadow("     Tab - Return to main menu",400-32,252,0,4)
 351 REM
-352 PROCshadow("© Graeme & Stephen Scott 1994-2011",(23*16),80,9,4)
-353 PROCshadow("Visit www.sassquad.net for the latest updates",(17.5*16),32,9,4)
+352 PROCdrawcredits
 354 VDU4
 355 ENDPROC
 356 :
@@ -360,10 +359,9 @@
 360 PROCshadow(STR$(televal),656,752,12,8):PROCshadow(STR$(shldval),656,552,12,8):PROCsize(8,8):PROCshadow("Select to increase, Adjust to decrease",336,920,0,4)
 361 PROCshadow("Food",492,848,11,4):SYS46,&122,area%,"pro3b",500,782,8:PROCshadow("Weapons",468,648,11,4):SYS46,&122,area%,"wep0b",500,582,8:PROCshadow("Teleports",660+24,848,11,4):SYS46,&122,area%,"pro1b",736,782,8
 362 PROCshadow("Shields",700,648,11,4):SYS 46,&122,area%,"pro0b",736,582,8:
-363 GCOL12:RECTANGLE0,120,224,64:PROCshadow("Instructions",16,120+48,9,4):
-364 GCOL12:RECTANGLE224+128,120,224,64:GCOL11:RECTANGLE FILL224+130,124,220,56:PROCshadow("Play",(224+128)+(5*16),120+48,14,4)
-365 GCOL12:RECTANGLE(2*224)+(2*128),120,224,64:PROCshadow("Desktop",(2*224)+(2*128)+(3.5*16),120+48,14,4):
-366 PROCshadow("Load cave",(3*224)+(3*128)+(2*16),120+48,9,4):GCOL12:RECTANGLE(3*224)+(3*128)-8,120,224,64:PROCsize(32,8):VDU4
+363 PROCbutton(0,"Instructions",9):PROCbutton(2,"Host",14):PROCbutton(3,"Join",14):PROCbutton(4,"Desktop",14):PROCbutton(5,"Load cave",9)
+364 GCOL11:RECTANGLE FILL218,124,196,56:PROCbutton(1,"Play",14)
+365 PROCsize(32,8):VDU4
 367 ENDPROC
 368 :
 369 DEF PROCdronening:REM Attaching a voice cuts off the channel's sound, so only attach it just before each groan
@@ -376,7 +374,7 @@
 376 ENDPROC
 377 :
 378 DEF PROCmouse
-379 IF screen=1 AND INKEY-99:CALL fade:PROCclearbanks2:PROCplay:CALL fade:PROCclearbanks:PROCmenu:ENDPROC
+379 IF screen=1 AND INKEY-99:PROCstartgame(0,""):ENDPROC
 380 LOCAL MX%,MY%,but%
 381 MOUSE MX%,MY%,but%
 382 IF but%=0 THEN ENDPROC
@@ -386,15 +384,15 @@
 386 WHEN 1:
 387 food=FNrange(424,712,200,48):weap=FNrange(424,512,200,48)
 388 tran=FNrange(656,712,200,48):shld=FNrange(656,512,200,48)
-389 play=FNrange((224+128),120,224,64)
-390 help=FNrange(0,120,224,64)
-391 quit=FNrange((2*224)+(2*128),120,224,64)
-392 new=FNrange((3*224)+(3*128)-8,120,224,64)
+389 play=FNrange(216,120,200,64)
+390 help=FNrange(0,120,200,64):host=FNrange(432,120,200,64):join=FNrange(648,120,200,64)
+391 quit=FNrange(864,120,200,64)
+392 new=FNrange(1080,120,200,64)
 393 IF food GCOL15:RECTANGLE FILL424,712,200,48:foodval+=step:PROCcheckvals:PROCshadow(STR$(foodval),424,752,12,8)
 394 IF weap GCOL15:RECTANGLE FILL424,512,200,48:weapval+=step:PROCcheckvals:PROCshadow(STR$(weapval),424,552,12,8)
 395 IF tran GCOL15:RECTANGLE FILL656,712,200,48:televal+=step:PROCcheckvals:PROCshadow(STR$(televal),656,752,12,8)
 396 IF shld GCOL15:RECTANGLE FILL656,512,200,48:shldval+=step:PROCcheckvals:PROCshadow(STR$(shldval),656,552,12,8)
-397 IF play CALL fade:PROCclearbanks2:PROCplay:CALL fade:PROCclearbanks:PROCmenu:ENDPROC
+397 IF play OR host OR join PROCstartbutton:ENDPROC
 398 IF help CALL fade:PROCinstruct:CALL fade:PROCclearbanks:PROCmenu:ENDPROC
 399 IF new CALL fade:PROCloadnewcaves:CALL fade:PROCclearbanks:PROCmenu:ENDPROC
 400 IF quit CALL fade:PROCquit:ENDPROC
@@ -499,14 +497,7 @@
 499 :
 500 REM Clearing teleporters
 501 PROCshadow("Clearing teleports",26*16,400,14,8)
-502 teletoscx()=0
-503 teletoscy()=0
-504 teletox()=0
-505 teletoy()=0
-506 tscx()=0
-507 tscy()=0
-508 tx()=0
-509 ty()=0
+502 PROCclearteleports
 510 :
 511 GCOL7
 512 RECTANGLE FILL0,360,1280,50
@@ -571,7 +562,7 @@
 571 :
 572 DEF PROCtidy
 573 CALL fade
-574 SYS "Hourglass_Off":
+574 SYS "Hourglass_Off":PROCnet_close
 575 MOUSE OFF:VDU26:COLOUR128:CLS
 576 SYS "OS_Byte",15,0
 577 VDU 20
@@ -580,7 +571,7 @@
 580 DEF PROCplay
 581 CLS:FOR I%=0TO15:VDU19,I%,0;0;:NEXT:PROCclearbanks
 582 MOUSE OFF
-583 gapfire=0:PROCseed(TIME):REM A networked game will seed both machines with the same number
+583 gapfire=0:PROCseed(FNnet_seed):REM A network game seeds both machines with the same number
 584 REM Recall pre-positioned objects
 585 FOR obj=1 TO numofobjs
 586 screen$(obj_scx(obj),obj_scy(obj),obj_x(obj),obj_y(obj))=obj_remem$(obj)
@@ -1371,14 +1362,124 @@
 1371 pad%(1)=-(INKEY-98)-2*(INKEY-67)-4*(INKEY-68)-8*(INKEY-83)-16*(INKEY-84)
 1372 pad%(2)=-(INKEY-108 OR INKEY-101)-2*(INKEY-125 OR INKEY-86)-4*(INKEY-27 OR INKEY-71)-8*(INKEY-109 OR INKEY-102)-16*(INKEY-59 OR INKEY-87)
 1373 ctl%=-(INKEY-90)-2*(INKEY-17)-4*(INKEY-82)-8*(INKEY-97)-16*(INKEY-99)
-1374 ENDPROC
-1375 :
-1376 DEF PROCseed(s%):REM The game's own random numbers: the same seed always gives the same game, unlike RND
-1377 rnd%=s%:IF rnd%=0 THEN rnd%=1
-1378 ENDPROC
-1379 :
-1380 DEF FNrnd(n%):REM 1 to n%, like RND(n%), from a xorshift generator
-1381 rnd%=rnd% EOR (rnd%<<13)
-1382 rnd%=rnd% EOR (rnd%>>>17)
-1383 rnd%=rnd% EOR (rnd%<<5)
-1384 =(rnd%>>>1) MOD n%+1
+1374 IF FNnet_player THEN PROCnetkeys
+1375 ENDPROC
+1376 :
+1377 DEF PROCnetkeys:REM This machine plays one side, on either set of keys; the other machine sends the other side's
+1378 LOCAL me%,them%,p%
+1379 p%=FNnet_player
+1380 me%=pad%(1) OR pad%(2) OR (ctl% AND 24)<<2
+1381 PROCnet_swap(me%,FNstatecheck,them%)
+1382 pad%(p%)=me% AND 31:pad%(3-p%)=them% AND 31
+1383 ctl%=(ctl% AND 6) OR ((me% OR them%)>>2 AND 24):REM Sound stays on this machine; pause is off, as it would stop the other player too
+1384 IF FNnet_lost THEN ctl%=ctl% OR 8
+1385 ENDPROC
+1386 :
+1387 DEF FNstatecheck:REM 1 to 128 from the game's state, which both machines in a network game must agree on every frame
+1388 =(((rnd% AND 255)+YOUX(1)+3*YOUY(1)+5*YOUX(2)+7*YOUY(2)+11*screenx(1)+13*screeny(1)+17*screenx(2)+19*screeny(2)+23*INT(energy(1))+29*INT(energy(2))) AND 127)+1
+1389 :
+1390 DEF PROCseed(s%):REM The game's own random numbers: the same seed always gives the same game, unlike RND
+1391 rnd%=s%:IF rnd%=0 THEN rnd%=1
+1392 ENDPROC
+1393 :
+1394 DEF FNrnd(n%):REM 1 to n%, like RND(n%), from a xorshift generator
+1395 rnd%=rnd% EOR (rnd%<<13)
+1396 rnd%=rnd% EOR (rnd%>>>17)
+1397 rnd%=rnd% EOR (rnd%<<5)
+1398 =(rnd%>>>1) MOD n%+1
+1399 :
+1400 DEF PROCstartbutton:REM Play, Host or Join on the menu has been clicked
+1401 IF play PROCstartgame(0,""):ENDPROC
+1402 IF host PROCstartgame(1,FNnet_var("CavernDuel$Relay")):ENDPROC
+1403 PROCjoin
+1404 ENDPROC
+1405 :
+1406 DEF PROCstartgame(role%,address$):REM Connect first if this is a network game, then play
+1407 LOCAL x%,y%,b%
+1408 IF FNnet_connect(role%,address$,TIME) AND role%<>0 THEN PROCsharecave
+1409 IF FNnet_lost THEN
+1410 IF FNnet_why="Cancelled" THEN PROCclearstatus ELSE PROCuser_netstatus(FNnet_why)
+1411 PROCnet_close
+1412 REPEAT:MOUSE x%,y%,b%:UNTIL b%=0 AND INKEY-99=0
+1413 ENDPROC
+1414 ENDIF
+1415 CALL fade:PROCclearbanks2:PROCplay:CALL fade:PROCclearbanks:PROCmenu
+1416 IF FNnet_lost THEN PROCuser_netstatus(FNnet_why)
+1417 PROCnet_close
+1418 ENDPROC
+1419 :
+1420 DEF PROCjoin:REM Ask for the host's address, and remember it for next time
+1421 LOCAL a$
+1422 a$=FNaskaddress
+1423 IF a$="" THEN PROCclearstatus:ENDPROC
+1424 SYS "XOS_CLI","Set CavernDuel$Address "+a$
+1425 PROCstartgame(2,a$)
+1426 ENDPROC
+1427 :
+1428 DEF FNaskaddress:REM Type an address in the strip along the bottom of the menu; "" if cancelled
+1429 LOCAL a$,k%,x%,y%,b%
+1430 a$=FNnet_var("CavernDuel$Address")
+1431 REPEAT:MOUSE x%,y%,b%:UNTIL b%=0
+1432 SYS "OS_Byte",15,0
+1433 REPEAT
+1434 PROCuser_netstatus("Host's address: "+a$+"_  - Return connects, Tab cancels")
+1435 REPEAT:PROCdronening:k%=INKEY(10):UNTIL k%>=0
+1436 CASE k% OF
+1437 WHEN 8,127:a$=LEFT$(a$,LEN(a$)-1)
+1438 WHEN 9:=""
+1439 WHEN 46,48,49,50,51,52,53,54,55,56,57,58:IF LEN(a$)<21 THEN a$+=CHR$k%
+1440 ENDCASE
+1441 UNTIL k%=13 AND a$<>""
+1442 =a$
+1443 :
+1444 DEF PROCsharecave:REM The host sends its settings and cave. Both machines then load the cave afresh, so nothing is left over from an earlier game
+1445 LOCAL n%,t%,e%,f%
+1446 PROCuser_netstatus("Sharing the cave")
+1447 IF FNnet_player=1 THEN
+1448 SYS "OS_File",5,"<Game$Path>" TO t%,,,,n%
+1449 IF t%<>1 OR n%>cavesize% THEN PROCnet_stop("This cave file can't be sent"):ENDPROC
+1450 SYS "OS_File",255,"<Game$Path>",cave%+20,0
+1451 !cave%=n%:cave%!4=foodval:cave%!8=weapval:cave%!12=televal:cave%!16=shldval
+1452 PROCnet_send(cave%,20+n%)
+1453 ELSE
+1454 PROCnet_recv(cave%,20):IF FNnet_lost THEN ENDPROC
+1455 n%=!cave%:IF n%<0 OR n%>cavesize% THEN PROCnet_stop("The host's cave file is too big"):ENDPROC
+1456 PROCnet_recv(cave%+20,n%):IF FNnet_lost THEN ENDPROC
+1457 foodval=cave%!4:weapval=cave%!8:televal=cave%!12:shldval=cave%!16
+1458 SYS "XOS_File",10,"<Wimp$ScrapDir>.CDuelCave",&022,,cave%+20,cave%+20+n% TO e%;f%
+1459 IF f% AND 1 THEN PROCnet_stop("Can't save the host's cave (is !Scrap missing?)"):ENDPROC
+1460 SYS "XOS_CLI","Set Game$Path <Wimp$ScrapDir>.CDuelCave"
+1461 ENDIF
+1462 IF FNnet_lost THEN ENDPROC
+1463 PROCuser_netstatus("Loading the cave")
+1464 PROCclearteleports:PROCloadscreens("<Game$Path>")
+1465 PROCshowside:PROCnet_begin
+1466 ENDPROC
+1467 :
+1468 DEF PROCclearteleports
+1469 teletoscx()=0:teletoscy()=0:teletox()=0:teletoy()=0
+1470 tscx()=0:tscy()=0:tx()=0:ty()=0
+1471 ENDPROC
+1472 :
+1473 DEF PROCbutton(i%,text$,col%):REM One of the buttons along the bottom of the menu
+1474 GCOL12:RECTANGLE216*i%,120,200,64:PROCshadow(text$,216*i%+100-LEN(text$)*8,168,col%,4)
+1475 ENDPROC
+1476 :
+1477 DEF PROCdrawcredits
+1478 PROCshadow("© Graeme & Stephen Scott 1994-2026",(23*16),80,9,4)
+1479 PROCshadow("Visit www.sassquad.net for the latest updates",(17.5*16),32,9,4)
+1480 ENDPROC
+1481 :
+1482 DEF PROCclearstatus:REM Back to the credits in the strip along the bottom of the menu
+1483 GCOL7:RECTANGLE FILL0,0,1280,112:PROCsize(8,8):PROCdrawcredits:PROCsize(32,8)
+1484 ENDPROC
+1485 :
+1486 DEF PROCuser_netstatus(text$):REM Network messages go in a strip along the bottom of the menu
+1487 GCOL7:RECTANGLE FILL0,0,1280,112:PROCsize(8,8):PROCshadow(text$,640-LEN(text$)*8,72,0,0):PROCsize(32,8):REM Back to the size the menu draws its numbers in
+1488 ENDPROC
+1489 :
+1490 DEF PROCshowside:REM A moment to see which player this machine plays, before the first frame
+1491 LOCAL t%
+1492 IF FNnet_player=1 THEN PROCuser_netstatus("You are Player 1 - green, top half of the screen") ELSE PROCuser_netstatus("You are Player 2 - red, bottom half of the screen")
+1493 t%=TIME:REPEAT:UNTIL TIME-t%>300
+1494 ENDPROC

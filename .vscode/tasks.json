@@ -27,6 +27,13 @@
       "problemMatcher": []
     },
     {
+      "label": "Make release zip",
+      "detail": "Build, then make dist/CavernDuel.zip to unpack on RISC OS",
+      "type": "shell",
+      "command": "python3 tools/build.py release",
+      "problemMatcher": []
+    },
+    {
       "label": "Run on RISC OS 5",
       "detail": "Build, then start RPCEmu with the RISC OS Direct machine",
       "type": "shell",

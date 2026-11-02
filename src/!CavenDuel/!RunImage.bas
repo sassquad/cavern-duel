@@ -2,7 +2,7 @@
 2 REM Prepared by Stephen Scott using DrWimp 4.70, upgraded to DrWimp 5.04
 3 REM Thanks to Andy Southgate for WIMP code of previous versions
 4 REM V1.271 (26-Feb-2011)
-5 REM (c) 1994-2011
+5 REM (c) 1994-2026
 6
 7 LIBRARY "<CavenDuel$Dir>.DrWimp"
 8
