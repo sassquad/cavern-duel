@@ -72,6 +72,10 @@ If you edit BASIC inside RISC OS (with StrongED, Zap or `EDIT`), run
 **Pull BASIC from app** to bring the changes back into `src/` before
 committing.
 
+To give the game to someone, run the **Make release zip** task. It builds
+`dist/CavernDuel.zip`, with `docs/release-readme.txt` as its ReadMe. Unpack it
+on RISC OS, where the zip's file types are restored.
+
 Other tasks: **Check sources** and **Test tokeniser**. **Check sources**
 confirms every file round-trips, then lints each program against the
 libraries it loads. BASIC only reports a call to a missing routine, or a

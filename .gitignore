@@ -1,5 +1,6 @@
 # Built from src/*.bas by tools/build.py
 app/**/*,ffb
 deploy.local.json
+dist/
 __pycache__/
 .DS_Store
