@@ -113,8 +113,8 @@ work for modern RISC OS 5 machines:
   fades via OS_Word 11/12 and screen banks via OS_Byte 112/113. Low-colour
   rectangular-pixel modes may not be available on newer hardware such as the
   Raspberry Pi; moving to a 256-colour mode string is the likely fix.
-- **Timing.** Game speed relies on `TIME` busy-waits (e.g. `Game` line
-  646), so it varies with machine speed; a fixed frame rate would help.
+- **Timing.** Frames start every 5 centiseconds by `TIME` (`Game` line 646),
+  so speed only varies on a machine too slow to draw a frame in that time.
 - **Dr Wimp.** Both apps use Dr Wimp 5.04, the latest release. The
   launcher moved from 4.70 with one change; `!CavernEd`, which had its own
   1995 desktop code, was rewritten onto Dr Wimp.

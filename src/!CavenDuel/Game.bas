@@ -590,7 +590,7 @@
 599 player%=1:SYS 46,&122,area%,"1d0",YOUX(player%)*64,512+YOUY(player%)*32,8
 600 player%=2:SYS 46,&122,area%,"2d0",YOUX(player%)*64,YOUY(player%)*32-4,8
 601 PROCcolours(2)
-602 :
+602 frame%=TIME
 603 REPEAT
 604 SYS 46,&222,grab%,bg%,0,0,0
 605 SYS 46,&222,grabtwo%,bg2%,0,512,0
@@ -634,13 +634,13 @@
 643 PROCprintmaps
 644 IF energy(1)<=0 OR energy(2)<=0:counttillend%+=1:PROCprintwinner
 645 IF counttillend%=1:SOUND2,-15,&1000,100:PROCfindwinner
-646 TIME=0:REPEAT UNTIL TIME=5:REM Time Delay to get speed the same (removed for VRPC-SE)
+646 frame%+=5:REPEAT UNTIL TIME-frame%>=0:IF TIME-frame%>20 THEN frame%=TIME:REM A frame starts every 5cs, however long this one took. After a short hold-up the game catches up; after a long one it carries on from now
 647 WAIT
 648 SYS 6,112,s1%
 649 SYS 6,113,s2%
 650 SWAP s1%,s2%
 651 UNTIL end%=1 OR counttillend%>90
-652 creds=1
+652 TIME=0:creds=1:REM The menu's groans go by TIME
 653 :
 654 REM Clear map of waste.
 655 scrposx=0:scrposy=0
