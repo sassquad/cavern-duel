@@ -1,6 +1,6 @@
 1 REM >!RunImage
 2 REM Cavern Duel Editor
-3 REM Version 1.38 (30th October, 2026) Desktop code moved to Dr Wimp 5.04
+3 REM Version 1.38 (3rd November, 2026) Desktop code moved to Dr Wimp 5.04; Adjust on the icon bar icon opens the menu; hold a button to keep drawing
 4 REM Version 1.37 (4th December, 1997) Final Release
 5 REM Written and designed by Stephen Scott 1995, 1996, 1997
 6 REM Desktop code by Dr Wimp: Andrew Ayre, Guy Bartle and Ray Favre
@@ -42,7 +42,7 @@
 42 :
 43 DEF PROCuser_mouseclick(window%,icon%,button%,workx%,worky%)
 44 CASE window% OF
-45 WHEN -2          : PROCUser_MouseBar
+45 WHEN -2          : IF button%=4 THEN PROCUser_MouseBar ELSE PROCbarmenu(icon%)
 46 WHEN checker%    : PROCUser_Mousechecker(icon%)
 47 WHEN screen%     : PROCUser_MouseScreen(button%,workx%,worky%)
 48 WHEN Icons%      : PROCUser_Mouseicons(button%,icon%)
@@ -150,7 +150,7 @@
 150 =-1
 151 :
 152 DEF PROCuser_null
-153 ENDPROC
+153 PROCpaint:ENDPROC
 154 :
 155 DEF PROCuser_menuopen(menu%,window%,icon%)
 156 ENDPROC
@@ -420,7 +420,7 @@
 420 WHEN "18":red=FALSE
 421 ENDCASE
 422 screen$(screen_x%,screen_y%,mx,(15-my))=s$
-423 PROCwimp_updatewindow(screen%,mx*64,-(my+1)*32,(mx+1)*64,-my*32)
+423 PROCwimp_updatewindow(screen%,mx*64,-(my+1)*32,(mx+1)*64,-my*32):IF s$<>"7" AND s$<>"17" AND s$<>"18" THEN paint%=button%:paintx%=mx:painty%=my:NULL%=TRUE
 424 ENDPROC
 425 :
 426 DEF PROCclicker(workx%,worky%)
@@ -773,3 +773,37 @@
 773 PROCwimp_error(app_title$,"This file could not be saved into the selected directory.",0,"",0,1,"")
 774 ENDIF
 775 ENDPROC
+776 :
+777 DEF PROCbarmenu(icon%):REM Adjust opens the menu too, as RPCEmu's two-button mouse mode turns the middle button into Adjust
+778 LOCAL x%,y%,b%
+779 MOUSE x%,y%,b%:PROCwint_menuclick(-2,icon%,x%,y%)
+780 ENDPROC
+781 :
+782 DEF PROCpaint:REM Called while a button is held after placing a tile: keep drawing wherever the pointer goes
+783 LOCAL x%,y%,n%,i%
+784 IF FNpaintdone THEN ENDPROC
+785 IF wimp%!12<>screen% THEN paintx%=-1:ENDPROC
+786 x%=wimp%!0:y%=wimp%!4
+787 x%=FNwimp_screentowork(screen%,x%,0) DIV 64:y%=(-FNwimp_screentowork(screen%,y%,1)) DIV 32
+788 IF x%<0 OR x%>15 OR y%<0 OR y%>15 THEN paintx%=-1:ENDPROC
+789 IF paintx%<0 THEN paintx%=x%:painty%=y%:PROCpaintcell(x%,y%)
+790 n%=ABS(x%-paintx%):IF ABS(y%-painty%)>n% THEN n%=ABS(y%-painty%)
+791 IF n%=0 THEN ENDPROC ELSE FOR i%=1 TO n%:REM A quick move jumps several squares between polls, so fill in the line
+792 PROCpaintcell(paintx%+INT((x%-paintx%)*i%/n%+0.5),painty%+INT((y%-painty%)*i%/n%+0.5))
+793 NEXT
+794 paintx%=x%:painty%=y%
+795 ENDPROC
+796 :
+797 DEF FNpaintdone:REM TRUE, and stop drawing, if the button has been let go
+798 SYS "Wimp_GetPointerInfo",,wimp%
+799 IF (wimp%!8 AND paint%)<>0 THEN =FALSE
+800 NULL%=FALSE
+801 =TRUE
+802 :
+803 DEF PROCpaintcell(x%,y%):REM Draw one square, going around staircase teleports and players so that a stroke can't wipe them
+804 LOCAL a$
+805 a$=screen$(screen_x%,screen_y%,x%,15-y%)
+806 IF a$=s$ OR a$="7" OR a$="17" OR a$="18" THEN ENDPROC
+807 screen$(screen_x%,screen_y%,x%,15-y%)=s$:update=TRUE
+808 PROCwimp_updatewindow(screen%,x%*64,-(y%+1)*32,(x%+1)*64,-y%*32)
+809 ENDPROC

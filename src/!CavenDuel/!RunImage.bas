@@ -1,13 +1,13 @@
 1 REM Cavern Duel - !RunImage
 2 REM Prepared by Stephen Scott using DrWimp 4.70, upgraded to DrWimp 5.04
 3 REM Thanks to Andy Southgate for WIMP code of previous versions
-4 REM V1.271 (26-Feb-2011)
+4 REM V1.30 (3-Nov-2026)
 5 REM (c) 1994-2026
 6
 7 LIBRARY "<CavenDuel$Dir>.DrWimp"
 8
 9 appname$="CavenDuel"
-10 ver$="1.271 (26-Feb-2011)"
+10 ver$="1.30 (3-Nov-2026)"
 11
 12 ON ERROR PROCwimp_error(appname$,REPORT$+" at line "+STR$(ERL),1,"",0,1,""):PROCuser_error:PROCwimp_closedown:END
 13 task%=FNwimp_initialise(appname$,7000,360,0)
@@ -37,7 +37,7 @@
 37 ENDPROC
 38 :
 39 DEF PROCuser_mouseclick(window%,icon%,button%,workx%,worky%)
-40 IF window%=bar% PROCplay
+40 IF window%=bar% PROCbarclick(button%,icon%)
 41 ENDPROC
 42 :
 43 DEF FNuser_menu(window%,icon%,screenx%,screeny%)
@@ -165,3 +165,9 @@
 165 REM SYS "Wimp_StartTask","Obey -c <CavenDuel$Dir>.!RunGame"
 166 PROCwimp_starttask("Obey -c <CavenDuel$Dir>.!RunGame")
 167 ENDPROC
+168 :
+169 DEF PROCbarclick(button%,icon%):REM Select plays. Adjust opens the menu too, as RPCEmu's two-button mouse mode turns the middle button into Adjust
+170 LOCAL x%,y%,b%
+171 IF button%=4 THEN PROCplay:ENDPROC
+172 MOUSE x%,y%,b%:PROCwint_menuclick(bar%,icon%,x%,y%)
+173 ENDPROC

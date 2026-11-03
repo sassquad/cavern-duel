@@ -1,12 +1,9 @@
 Cavern Duel Editor
 
-Version 1.37 (4th December, 1997)
+Version 1.38 (3rd November, 2026)
 
-By Graeme and Stephen Scott
-with the aid of !WimpEd by Joe Taylor © Archimedes World 1992
-© June 1994 - December 1997. Revisited August 2006
-
-
+By Graeme and Stephen Scott ï¿½ 1994-2026.
+WIMP front end by Dr Wimp 5.04
 
   /\
   \/  INTRODUCTION
@@ -15,27 +12,16 @@ with the aid of !WimpEd by Joe Taylor © Archimedes World 1992
       printed this out!). This text will explain how to load and use the
       editor.
 
-      Version 1.37 is the first release of this software to the public,
-      and as such is lacking in features. It's taken me six months alone
-      just to get the Wimp code working at this stage, so I've kept it
-      very simple for easy use. It is unlikely that the editor will be
-      improved, except for bug fixes. The program is provided "as is"
-      and we cannot be held responsible for any data loss caused by its
-      use.
-
       The editor allows you to design your own CaveFiles for use in the
-      Cavern Duel game. They can then be dragged to the !CavenDuel icon
+      Cavern Duel game. Your designs can be of any size up to a
+      maximum of eight screens long and four screens high, making 32
+      interconnected screens, each consisting of a grid of 16x16 icons.
+      These files can then be dragged to the !CavenDuel icon
       to play (after saving the CaveFile to disc/hard disc beforehand!),
       or be moved into the Screens directory inside the !CavenDuel
       application structure for loading within the game. See the
       !CavenDuel documentation for details on how to implement this
       feature.
-
-      The editor allows you to design a CaveFile of any size up to a
-      maximum of eight screens long, and four screens high, making 32
-      interconnected screens, of 16x16 icons. You can only edit one
-      CaveFile at a time, although there is nothing wrong in loading
-      another copy of !CavernEd to edit another at the same time.
 
   /\
   \/  LOADING THE EDITOR
@@ -47,10 +33,6 @@ with the aid of !WimpEd by Joe Taylor © Archimedes World 1992
       To load the Cavern Duel Editor, double-click on the !CavernEd icon
       in your chosen directory. After a few seconds, the same icon will
       appear on the right hand side of the icon bar on the desktop.
-
-      Alternatively, you can double-click on any CaveFile to load the
-      editor. Unfortunately, in this version (1.37) that CaveFile will
-      not be loaded for editing. Any help on this would be appreciated.
 
       Clicking the Menu (middle) mouse button on the icon will bring up
       the following menu:
@@ -86,7 +68,10 @@ with the aid of !WimpEd by Joe Taylor © Archimedes World 1992
          The other mouse buttons are used to draw inside the currently
          selected screen. Two different icons can be used at once. By
          default, Select draws simple paths, while Adjust draws with
-         the eraser icon. These icons will be explained later.
+         the eraser icon. These icons will be explained later. Hold the
+         button down to keep drawing as you move the mouse. This goes around
+         any staircase teleports and players, which need a click of their own
+         to replace.
 
          * THE MAP WINDOW
 
@@ -219,11 +204,11 @@ with the aid of !WimpEd by Joe Taylor © Archimedes World 1992
          * Try and position the players starting positions as far away as
            possible. It`s much more fun finding each other then!
          * Don`t get your inpeneterable blocks mixed up with the
-           transparent ones. Consult the Draw file ”Icons• for reference.
+           transparent ones. Consult the Draw file ï¿½Iconsï¿½ for reference.
          * Make sure you have a boundary surrounding the outer fringes of
            your screens, otherwise the game will crash, when you wander out!
          * Make bonus rooms (places with lots of goodies) difficult to get
-           to (the ”Complex• file is a prime example!).
+           to (the ï¿½Complexï¿½ file is a prime example!).
          * Be creative! The results may take a while to perfect, but it is
            worth it in the end!
 
@@ -252,15 +237,11 @@ with the aid of !WimpEd by Joe Taylor © Archimedes World 1992
   /\
   \/  KNOWN PROBLEMS WITH THE SOFTWARE
 
-      Since this is the first release of !CavernEd, it is very basic in
-      use and design. Therefore, there are bound to be lots of things
-      that you would like to see in future releases of the software.
-
-      The problem is that we, the authors will not be giving our total
-      support to the software anymore, as we want to move onto pastures
-      new i.e. other programming projects. Any updates will be very few
-      and far between, and they will probably be just minor bug fixes,
-      along with the Cavern Duel game.
+      Although V1.38 has been updated to use the very latest Dr Wimp library,
+      this is only the second update to this software. AI assisted
+      development using Claude indicates that various bugs present in the
+      previous Wimp code are no longer present. Any issues that remain may
+      be with regards to speed or changing of screen modes.
 
       One silly little problem is that the Screen Window is quite slow to
       update, so try not to drag any other windows over it, otherwise it
@@ -289,14 +270,6 @@ with the aid of !WimpEd by Joe Taylor © Archimedes World 1992
       only be found out by playtesting. Do contact us if you find any
       strange bugs in your version.
 
-      Having seen Andrew Ayre's DrWimp programming system, I can safely
-      say that it is a much better system to program with, and I will be
-      using it for future projects.
-
-      Features of it include the use of interactive help and message
-      files for foreign users.  If this software is successful enough,
-      then we will get to work!
-
   /\
   \/  FILING SYSTEMS
 
@@ -323,10 +296,10 @@ with the aid of !WimpEd by Joe Taylor © Archimedes World 1992
       But to do this will take a little while. So follow this brief guide:
 
          * Load !Paint. Load the !Sprites file inside !CavernEd.
-         * Find the sprites ”file_022• and ”small_022•.
-         * Press Menu, and go to the sprite ”file_022• or whatever, and go
+         * Find the sprites ï¿½file_022ï¿½ and ï¿½small_022ï¿½.
+         * Press Menu, and go to the sprite ï¿½file_022ï¿½ or whatever, and go
            to the submenu. Go to Rename, to reveal the entry box. Now
-           replace the ”022• with your chosen filetype. Do the same with
+           replace the ï¿½022ï¿½ with your chosen filetype. Do the same with
            the other sprite.
          * Save the file.
          * Repeat the above procedure with the !Sprites22 file.
@@ -482,8 +455,14 @@ V1.37 (4th December, 1997)
  * Fixed a bug in the map window, and replaced all the OSCLI's with SYS XOS_CLI
    commands. Final release.
 
+V1.38 (3rd November, 2026)
+-----
+ * Rewrote the desktop code using Dr Wimp 5.04.
+ * Holding down Select or Adjust now keeps drawing as the mouse moves.
+ * Only Select on the icon bar icon opens the editor. Adjust now opens the
+   menu, as Menu does.
 
   /\
   \/  CONTACTING US
 
-      Visit www.sassquad.com/cavernduel for the latest news and updates.
+      Visit www.sassquad.net/cavernduel for the latest news and updates.
