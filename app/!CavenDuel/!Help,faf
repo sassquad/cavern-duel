@@ -226,8 +226,7 @@
     <h3><a name="compatibility" id="compatibility"></a>Compatibility </h3>
     <p>Versions 1.25 onwards will function on 32-bit RISC OS based systems. As the game is written entirely in Basic V,
         speed will be an issue on real hardware prior to the Acorn RISC PC.</p>
-    <p>As of 2026, game development takes place on an Apple Studio Mac running RPCEmu Extended, which runs both RISC OS
-        3.71 and RISC OS 5.04 for compatibility testing. The game therefore runs pretty well on these editions of RISC
+    <p>As of 2026, game development takes place on an Apple Studio Mac running RPCEmu Extended, which runs RISC OS 3.71, RISC OS 5.27 and RISC OS 5.30 for compatibility testing. The game therefore runs pretty well on these editions of RISC
         OS. <a href="#toc"><em>Back to top</em></a></p>
     <h3><a name="riscpc_users" id="riscpc_users"></a>Risc PC users </h3>
     <p>The game runs in 16 colour mode 12, and may be shown

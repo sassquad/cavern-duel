@@ -42,6 +42,14 @@
       "problemMatcher": []
     },
     {
+      "label": "Run on RISC OS 5.30",
+      "detail": "Build, then start RPCEmu with the RISC OS 5.30 machine",
+      "type": "shell",
+      "command": "tools/rpcemu.sh 530",
+      "dependsOn": "Build",
+      "problemMatcher": []
+    },
+    {
       "label": "Run on RISC OS 3.71",
       "detail": "Build, then start RPCEmu with the RISC OS 3.71 machine",
       "type": "shell",

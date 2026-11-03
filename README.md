@@ -22,14 +22,14 @@ app/                    the RISC OS applications, in HostFS format
   !CavernEd/            the cave editor
 tools/
   bbcbasic.py           tokeniser / detokeniser for BBC BASIC V
-  build.py              build, pull, check, deploy
+  build.py              build, pull, check, deploy, release
   lint.py               finds calls to missing routines and variable
                         clashes with libraries (run by check)
   import_zip.py         unpacks a RISC OS zip into app/ + src/
   test_bbcbasic.py      tokeniser tests
   netpeer.py            pretend player and relay for testing network play
-  setup_rpcemu.sh       installs RPCEmu Extended and the two machines
-  rpcemu.sh             starts a machine on RISC OS 5 or 3.71
+  setup_rpcemu.sh       installs RPCEmu Extended and the three machines
+  rpcemu.sh             starts a machine on RISC OS 5.27, 5.30 or 3.71
 docs/rpcemu-setup.md    RPCEmu Extended installation guide
 docs/network-play.md    network play: how it works and how to test it
 reference/              the original v1.271 release zip
@@ -64,7 +64,7 @@ The application folder really is called `!CavenDuel` (no "r"); `!Run` and
 1. Edit `src/**/*.bas` in VS Code.
 2. ⇧⌘B (**Build**). Errors such as an over-long line appear in the
    Problems panel.
-3. Run the **Run on RISC OS 5** (or **3.71**) task, or start RPCEmu with
+3. Run the **Run on RISC OS 5** (or **5.30** or **3.71**) task, or start RPCEmu with
    `tools/rpcemu.sh direct`. Open the **Shared** disc from the icon bar
    and double-click `!CavenDuel`.
 
