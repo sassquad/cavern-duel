@@ -38,6 +38,12 @@ copying.
   and the [HardDisc4 5.30 disc](https://www.riscosopen.org/content/downloads/common).
   `tools/unzip_acorn.py` unpacks the disc, keeping its file types, and the network
   settings come from RPCEmu Extended itself.
+
+  RISC OS is copyright RISC OS Developments Ltd and is maintained by RISC OS Open
+  Ltd. None of it is in this repository: the setup script downloads it from RISC
+  OS Open onto your Mac. Much of it is under the Apache 2.0 licence, and
+  [their licences page](https://www.riscosopen.org/content/documents/licences) has
+  the terms. Read those before passing on a ROM or disc.
 - **HostFS** is how RISC OS sees Mac folders. A RISC OS file type travels in
   the Mac filename as a suffix (`Game,ffb`), which is why `app/` is laid out
   that way.
