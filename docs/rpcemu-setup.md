@@ -1,11 +1,12 @@
 # Setting up RPCEmu Extended on the Mac
 
-This guide sets up two emulated Risc PCs on the Mac, using
+This guide sets up three emulated Risc PCs on the Mac, using
 [RPCEmu Extended](https://github.com/andrewtimmins/rpcemu-extended):
 
 | Machine  | RISC OS              | Use it for                                  |
 |----------|----------------------|---------------------------------------------|
-| `direct` | RISC OS 5 (Direct)   | Main target: modern 32-bit RISC OS          |
+| `direct` | RISC OS 5.27 (Direct) | Main target: modern 32-bit RISC OS, with many apps |
+| `ro530`  | RISC OS 5.30         | The current stable release, on RISC OS Open's own disc |
 | `ro371`  | RISC OS 3.71         | Checking the game still runs on old systems |
 
 Both machines see this project's `app/` folder as their **Shared** disc. Press
@@ -20,7 +21,7 @@ copying.
 - **The data folder**, `~/RPCEmu-Extended`:
 
   ```
-  configs/direct.cfg  configs/ro371.cfg     each machine's settings
+  configs/<name>.cfg                        each machine's settings
   machines/<name>/hostfs/                   its hard disc, as ordinary Mac files
   machines/<name>/cmos.ram                  its saved RISC OS settings
   machines/<name>/rpclog.txt                its log
@@ -32,6 +33,17 @@ copying.
   and CMOS settings. They are hosted on Google Drive, linked from
   <http://www.marutan.net/rpcemu/easystart.html>. The **"Other platforms"**
   editions are the ones used.
+- **RISC OS Open's downloads** supply `ro530`: the
+  [IOMD 5.30 stable ROM](https://www.riscosopen.org/content/downloads/riscpc)
+  and the [HardDisc4 5.30 disc](https://www.riscosopen.org/content/downloads/common).
+  `tools/unzip_acorn.py` unpacks the disc, keeping its file types, and the network
+  settings come from RPCEmu Extended itself.
+
+  RISC OS is copyright RISC OS Developments Ltd and is maintained by RISC OS Open
+  Ltd. None of it is in this repository: the setup script downloads it from RISC
+  OS Open onto your Mac. Much of it is under the Apache 2.0 licence, and
+  [their licences page](https://www.riscosopen.org/content/documents/licences) has
+  the terms. Read those before passing on a ROM or disc.
 - **HostFS** is how RISC OS sees Mac folders. A RISC OS file type travels in
   the Mac filename as a suffix (`Game,ffb`), which is why `app/` is laid out
   that way.
@@ -44,12 +56,13 @@ tools/setup_rpcemu.sh
 
 What it does, in order:
 
-1. It downloads three files into `~/RPCEmu-Extended/Downloads`, about 1.1 GB in
-   total: RPCEmu Extended 2.0.0, the RISC OS Direct bundle and the RISC OS 3.71
-   bundle.
-2. It installs `RPCEmu-Extended.app` into `~/Applications`.
+1. It downloads five files into `~/RPCEmu-Extended/Downloads`, about 1.1 GB in
+   total: RPCEmu Extended 2.0.0, the RISC OS Direct and RISC OS 3.71 bundles, and
+   RISC OS Open's 5.30 ROM and disc.
+2. It installs `RPCEmu-Extended.app` into `~/Applications`, unless a machine is
+   running.
 3. It links `~/RPCEmu-Extended/shared` to this project's `app/` folder.
-4. It builds the `direct` and `ro371` machines from the bundles, with
+4. It builds the `direct` and `ro371` machines from the bundles, and `ro530`, with
    two-button mouse mode and networking on. RISC OS 5 gets its network address
    by DHCP. RISC OS 3.71 can't use DHCP, so the script gives it the fixed
    address `100.64.0.10`. The script also adds a boot task to 3.71 so that
@@ -70,11 +83,15 @@ tools/rpcemu.sh direct
 ```
 
 ```bash
+tools/rpcemu.sh 530
+```
+
+```bash
 tools/rpcemu.sh 371
 ```
 
-Each machine opens in its own window, and both can run at once. There are also
-**Run on RISC OS 5** and **Run on RISC OS 3.71** tasks in VS Code (⇧⌘P ›
+Each machine opens in its own window, and they can all run at once. There are also
+**Run on RISC OS 5**, **Run on RISC OS 5.30** and **Run on RISC OS 3.71** tasks in VS Code (⇧⌘P ›
 *Tasks: Run Task*).
 
 ## Using RISC OS in the emulator
