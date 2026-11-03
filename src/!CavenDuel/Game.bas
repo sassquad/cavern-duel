@@ -1,10 +1,10 @@
 1 REM >!RunImage
 2 REM Cavern Duel
-3 REM Version 1.271 (26th February 2011)
+3 REM Version 1.30 (3rd November 2026)
 4 REM Copyright held by authors. Distribute freely, but do not alter any internal files!
 5 REM Written by Graeme and Stephen Scott © 1994-2026
 6 REM See documentation for contact details
-7 version$="Version 1.271 (26th February 2011)"
+7 version$="Version 1.30 (3rd November 2026)"
 8 ON ERROR MODE12:SYS "Hourglass_Off":REPORT:PRINT" at line ";ERL:IF GET:PROCtidy:END
 9 LIBRARY "<CavenDuel$Dir>.Net":PROCnet_init:SYS "OS_Byte",229,1: REM Load network play, disable Escape
 10 PROCarrays
