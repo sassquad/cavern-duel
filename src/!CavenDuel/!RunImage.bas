@@ -37,7 +37,7 @@
 37 ENDPROC
 38 :
 39 DEF PROCuser_mouseclick(window%,icon%,button%,workx%,worky%)
-40 IF window%=bar% PROCplay
+40 IF window%=bar% PROCbarclick(button%,icon%)
 41 ENDPROC
 42 :
 43 DEF FNuser_menu(window%,icon%,screenx%,screeny%)
@@ -165,3 +165,9 @@
 165 REM SYS "Wimp_StartTask","Obey -c <CavenDuel$Dir>.!RunGame"
 166 PROCwimp_starttask("Obey -c <CavenDuel$Dir>.!RunGame")
 167 ENDPROC
+168 :
+169 DEF PROCbarclick(button%,icon%):REM Select plays. Adjust opens the menu too, as RPCEmu's two-button mouse mode turns the middle button into Adjust
+170 LOCAL x%,y%,b%
+171 IF button%=4 THEN PROCplay:ENDPROC
+172 MOUSE x%,y%,b%:PROCwint_menuclick(bar%,icon%,x%,y%)
+173 ENDPROC

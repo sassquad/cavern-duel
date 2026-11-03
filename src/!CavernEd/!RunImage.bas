@@ -42,7 +42,7 @@
 42 :
 43 DEF PROCuser_mouseclick(window%,icon%,button%,workx%,worky%)
 44 CASE window% OF
-45 WHEN -2          : PROCUser_MouseBar
+45 WHEN -2          : IF button%=4 THEN PROCUser_MouseBar ELSE PROCbarmenu(icon%)
 46 WHEN checker%    : PROCUser_Mousechecker(icon%)
 47 WHEN screen%     : PROCUser_MouseScreen(button%,workx%,worky%)
 48 WHEN Icons%      : PROCUser_Mouseicons(button%,icon%)
@@ -773,3 +773,8 @@
 773 PROCwimp_error(app_title$,"This file could not be saved into the selected directory.",0,"",0,1,"")
 774 ENDIF
 775 ENDPROC
+776 :
+777 DEF PROCbarmenu(icon%):REM Adjust opens the menu too, as RPCEmu's two-button mouse mode turns the middle button into Adjust
+778 LOCAL x%,y%,b%
+779 MOUSE x%,y%,b%:PROCwint_menuclick(-2,icon%,x%,y%)
+780 ENDPROC
