@@ -11,7 +11,8 @@ Reports:
     warning when both copies are identical)
   - global variables shared between the program and a library, which
     can corrupt each other (a name used as a parameter or LOCAL in every
-    routine that sets it is not global)
+    routine that sets it is not global, and a library's SETTINGS are meant
+    to be shared)
 
 Exits 1 if any errors are reported; warnings don't count.
 """
@@ -20,6 +21,8 @@ import sys
 
 ROUTINE = re.compile(r'\b((?:PROC|FN)[A-Za-z_][A-Za-z0-9_`]*)')
 VAR = r'[A-Za-z_`][A-Za-z0-9_`]*[%$]?'
+# Globals a library expects the program to set: Dr Wimp's switch for PROCuser_null
+SETTINGS = {'NULL%'}
 
 
 def code_lines(path):
@@ -177,7 +180,7 @@ def main(argv):
             if name not in prog_defs:
                 print(f"{program}: error: {lib} calls {name} (line {line}) but the program doesn't define it")
                 problems += 1
-        shared = globals_of(prog_defs, top_level_assigned(program, prog_defs)) & globals_of(defs, set())
+        shared = globals_of(prog_defs, top_level_assigned(program, prog_defs)) & globals_of(defs, set()) - SETTINGS
         for name in sorted(shared):
             print(f"{program}: error: global {name} is also used as a global by {lib}")
             problems += 1
