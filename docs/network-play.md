@@ -119,8 +119,9 @@ TCP, port 30123 by default.
    `(slowest + 14) DIV 10 - 1`, kept between 2 and 6 frames. It sends the delay as
    one byte.
 3. The host sends five 4-byte little-endian numbers (the length of the cave
-   file, then food, weapons, teleports and shields), then the cave file. Both
-   machines then load that cave afresh.
+   file, then food, weapons, teleports and shields), then the cave file. The
+   joiner checks them against the menu's limits and the cave format, and leaves
+   the game if they aren't valid. Both machines then load that cave afresh.
 4. Each side sends as many empty frames as the delay, as padding.
 5. Every frame, each side sends two bytes:
    - **Controls:** 1 left, 2 right, 4 up, 8 down, 16 fire, 32 quit,

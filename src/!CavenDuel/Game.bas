@@ -1444,8 +1444,8 @@
 1453 ELSE
 1454 PROCnet_recv(cave%,20):IF FNnet_lost THEN ENDPROC
 1455 n%=!cave%:IF n%<0 OR n%>cavesize% THEN PROCnet_stop("The host's cave file is too big"):ENDPROC
-1456 PROCnet_recv(cave%+20,n%):IF FNnet_lost THEN ENDPROC
-1457 foodval=cave%!4:weapval=cave%!8:televal=cave%!12:shldval=cave%!16
+1456 PROCnet_recv(cave%+20,n%):IF NOT FNnet_lost THEN IF NOT FNsharedok(n%) THEN PROCnet_stop("The host's settings or cave aren't valid")
+1457 IF FNnet_lost THEN ENDPROC ELSE foodval=cave%!4:weapval=cave%!8:televal=cave%!12:shldval=cave%!16
 1458 SYS "XOS_File",10,"<Wimp$ScrapDir>.CDuelCave",&022,,cave%+20,cave%+20+n% TO e%;f%
 1459 IF f% AND 1 THEN PROCnet_stop("Can't save the host's cave (is !Scrap missing?)"):ENDPROC
 1460 SYS "XOS_CLI","Set Game$Path <Wimp$ScrapDir>.CDuelCave"
@@ -1483,3 +1483,30 @@
 1492 IF FNnet_player=1 THEN PROCuser_netstatus("You are Player 1 - green, top half of the screen") ELSE PROCuser_netstatus("You are Player 2 - red, bottom half of the screen")
 1493 t%=TIME:REPEAT:UNTIL TIME-t%>300
 1494 ENDPROC
+1495 :
+1496 DEF FNsharedok(n%):REM Is what the host sent usable? It may be from someone we don't know, so check it against the menu's limits and the cave format
+1497 IF cave%!4<5 OR cave%!4>120 OR cave%!8<4 OR cave%!8>30 OR cave%!12<0 OR cave%!12>10 OR cave%!16<0 OR cave%!16>20 THEN =FALSE
+1498 =FNcaveok(cave%+20,n%)
+1499 :
+1500 DEF FNcaveok(p%,n%):REM A cave file: one byte, then 32 screens, each 256 squares and a "-". A staircase (7) is followed by four letters giving its destination, A being 0
+1501 LOCAL i%,s%,c%,k%,tele%,obj%,p1%,p2%
+1502 i%=1
+1503 FOR s%=1 TO 32
+1504 FOR c%=1 TO 256
+1505 IF i%>=n% THEN =FALSE
+1506 k%=p%?i%:i%+=1
+1507 IF (k%<48 OR k%>57) AND (k%<65 OR k%>72) AND k%<>80 AND k%<>81 THEN =FALSE
+1508 IF k%=80 THEN p1%+=1
+1509 IF k%=81 THEN p2%+=1
+1510 IF k%>=65 AND k%<=70 THEN obj%+=1
+1511 IF k%=55 THEN
+1512 IF i%+4>n% THEN =FALSE
+1513 IF p%?i%<65 OR p%?i%>72 OR p%?(i%+1)<65 OR p%?(i%+1)>68 OR p%?(i%+2)<65 OR p%?(i%+2)>80 OR p%?(i%+3)<65 OR p%?(i%+3)>80 THEN =FALSE
+1514 i%+=4:tele%+=1
+1515 ENDIF
+1516 NEXT
+1517 IF i%>=n% THEN =FALSE
+1518 IF p%?i%<>45 THEN =FALSE
+1519 i%+=1
+1520 NEXT
+1521 =i%=n% AND tele%<=20 AND obj%<=200 AND p1%=1 AND p2%=1

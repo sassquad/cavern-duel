@@ -9,14 +9,15 @@
         To imitate the internet, each direction can be held up by --lag, up to
         --jitter more at random, and --spike more on 5% of its traffic.
 
-    netpeer.py host [address[:port]] [--port 30123] [--frames N]
+    netpeer.py host [address[:port]] [--port 30123] [--frames N] [--cave FILE] [--settings F,W,T,S]
     netpeer.py join address[:port] [--frames N]
         Play against one copy of the game with a pretend opponent that
         wanders about and fires now and then, printing what the game sends.
         "host" with no address waits for the game to connect (click Join and
         type 100.64.0.1 in RPCEmu); with an address it connects out, to a relay
         or to a game behind a port forward. It sends the Default cave and the
-        menu's starting settings.
+        menu's starting settings unless given others, which can be used to
+        try sending the game bad ones.
 
 The protocol is described at the top of src/!CavenDuel/Net.bas.
 """
@@ -170,7 +171,7 @@ def set_delay(player, conn):
     return delay
 
 
-def opponent(role, conn, frames):
+def opponent(role, conn, frames, cave_file=CAVE, settings=SETTINGS):
     player = 1 if role == "host" else 2
     seed = random.getrandbits(32)
     if player == 1:
@@ -191,9 +192,9 @@ def opponent(role, conn, frames):
     delay = set_delay(player, conn)
     print(f"input delay {delay} frames", flush=True)
     if player == 1:
-        with open(CAVE, "rb") as f:
+        with open(cave_file, "rb") as f:
             cave = f.read()
-        conn.sendall(struct.pack("<5I", len(cave), *SETTINGS) + cave)
+        conn.sendall(struct.pack("<5I", len(cave), *settings) + cave)
     else:
         head = recv_exact(conn, 20)
         if not head or recv_exact(conn, struct.unpack("<I", head[:4])[0]) is None:
@@ -228,16 +229,18 @@ def main(argv):
     parser.add_argument("--lag", type=int, default=0)
     parser.add_argument("--jitter", type=int, default=0)
     parser.add_argument("--spike", type=int, default=0)
+    parser.add_argument("--cave", default=CAVE)
+    parser.add_argument("--settings", type=lambda s: tuple(int(n) for n in s.split(",")), default=SETTINGS)
     args = parser.parse_args(argv[1:])
     try:
         if args.role == "relay":
             relay(args.port, args.lag, args.jitter, args.spike)
         elif args.address:
-            opponent(args.role, connect(address(args.address)), args.frames)
+            opponent(args.role, connect(address(args.address)), args.frames, args.cave, args.settings)
         elif args.role == "host":
             server = listen(args.port)
             print(f"waiting for the game on port {args.port}", flush=True)
-            opponent("host", accept(server), args.frames)
+            opponent("host", accept(server), args.frames, args.cave, args.settings)
         else:
             parser.error("join needs an address")
     except KeyboardInterrupt:
