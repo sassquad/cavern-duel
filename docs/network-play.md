@@ -33,9 +33,11 @@ both screens stay identical. The host plays player 1 and picks the seed;
 whoever joins plays player 2. On either machine you can use either set of
 keys.
 
-Controls take effect two frames (a tenth of a second) after they're sent,
-on both machines at once, so ordinary network lag doesn't slow the game
-down. If the checks ever differ, the games have drifted apart, and both stop
+Controls take effect a few frames after they're sent, on both machines at once,
+so ordinary network lag doesn't slow the game down. The host times the connection
+before the game and picks this delay for both machines: two frames (a tenth of a
+second) on a good connection, up to six on a slow one. A connection too slow even
+for that slows the game down rather than stopping it. If the checks ever differ, the games have drifted apart, and both stop
 with a message saying so.
 
 In a network game, pause is switched off (it would freeze the other player
@@ -92,23 +94,40 @@ guest operating system using that link hasn't been demonstrated.
 A game between RISC OS 5 and RISC OS 3.71 through the relay stayed in step for
 about 1,150 frames with both players moving and firing.
 
+### Imitating the internet
+
+The relay can hold up the game's traffic, to try it on a poor connection. Each
+direction is held up by `--lag` milliseconds, up to `--jitter` more at random, and
+`--spike` more on 5% of its traffic:
+
+```bash
+python3 tools/netpeer.py relay --lag 150 --jitter 30 --spike 200
+```
+
+Every 5 seconds the relay prints the game's speed in frames a second, which should
+stay at about 20.
+
 ## The protocol
 
 TCP, port 30123 by default.
 
-1. Greeting. The host sends `CDH`, the version (2) and the seed as 4 bytes
+1. Greeting. The host sends `CDH`, the version (3) and the seed as 4 bytes
    little-endian. The joiner sends `CDJ` and the version. Each checks the
    other's greeting.
-2. The host sends five 4-byte little-endian numbers (the length of the cave
+2. Five times, the host sends one byte and the joiner sends one back. From the
+   slowest of these, in centiseconds, the host works out the delay:
+   `(slowest + 14) DIV 10 - 1`, kept between 2 and 6 frames. It sends the delay as
+   one byte.
+3. The host sends five 4-byte little-endian numbers (the length of the cave
    file, then food, weapons, teleports and shields), then the cave file. Both
    machines then load that cave afresh.
-3. Each side sends two empty frames, the padding for the two-frame delay.
-4. Every frame, each side sends two bytes:
+4. Each side sends as many empty frames as the delay, as padding.
+5. Every frame, each side sends two bytes:
    - **Controls:** 1 left, 2 right, 4 up, 8 down, 16 fire, 32 quit,
      64 skip winner.
    - **Check:** 1–128 from the game's state, or 0 for no check.
 
-   The frame each side receives is the other's frame from two frames ago.
+   The frame each side receives is the other's frame from that many frames ago.
    That is the one both machines play now.
 
 The connection closes when the game ends.

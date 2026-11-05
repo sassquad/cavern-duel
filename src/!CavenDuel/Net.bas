@@ -5,13 +5,13 @@
 5 REM The Host and Join buttons on the menu start a game. An address is a numeric IP address, with :<port> on the end if it isn't 30123.
 6 REM If CavernDuel$Relay holds an address, Host connects out to a relay there (tools/netpeer.py) instead of waiting on port 30123.
 7 REM Each frame each side sends two bytes: its controls (1 left, 2 right, 4 up, 8 down, 16 fire, 32 quit, 64 skip winner)
-8 REM and a check of the game's state (0 for no check). Controls take effect net_delay% frames after they are sent,
+8 REM and a check of the game's state (0 for no check). Controls take effect net_delay% frames after they are sent (the host times the connection and picks this),
 9 REM on both machines at once, so a little network lag doesn't slow the game down.
 10 :
 11 DEF PROCnet_init
 12 DIM net_addr% 15,net_io% 63,net_ifs% 255,net_qin%(7),net_qck%(7)
 13 net_sock%=-1:net_listen%=-1:net_player%=0:net_seed%=0:net_frame%=0:net_why$=""
-14 net_port%=30123:net_delay%=2:net_version%=2:net_wait%=1000
+14 net_port%=30123:net_delay%=2:net_version%=3:net_wait%=1000
 15 ENDPROC
 16 :
 17 DEF FNnet_connect(role%,host$,seed%):REM role% 0 for a game on one machine, 1 to host, 2 to join; TRUE once ready to play. host$ is who to connect to, "" for a host to wait
@@ -152,7 +152,7 @@
 152 IF net_io%?2=ASC(MID$("HJ",net_player%,1)) THEN net_why$="Both players are set to "+MID$("hostjoin",net_player%*4-3,4):ENDPROC
 153 IF net_io%?3<>net_version% THEN net_why$="The other player has a different version of Cavern Duel":ENDPROC
 154 IF net_player%=2 THEN net_seed%=net_io%!4
-155 ENDPROC
+155 PROCnet_setdelay:ENDPROC
 156 :
 157 DEF PROCnet_send(p%,n%):REM Send n% bytes from p%
 158 LOCAL done%,r%,f%,t%
@@ -239,3 +239,23 @@
 239 LOCAL p%,s$
 240 p%=e%+4:WHILE ?p%>=32:s$+=CHR$?p%:p%+=1:ENDWHILE
 241 =s$
+242 :
+243 DEF PROCnet_setdelay:REM Five round trips of one byte, timed by the host, which then sends the delay to use. A frame reaches the game in time if it takes under net_delay%+1 frames each way, with a frame to spare here
+244 LOCAL i%,t%,worst%
+245 FOR i%=1 TO 5
+246 t%=TIME
+247 IF net_player%=1 THEN PROCnet_send(net_io%,1):PROCnet_recv(net_io%,1) ELSE PROCnet_recv(net_io%,1):PROCnet_send(net_io%,1)
+248 IF TIME-t%>worst% THEN worst%=TIME-t%
+249 NEXT
+250 IF net_why$<>"" THEN ENDPROC
+251 IF net_player%=1 THEN
+252 net_delay%=(worst%+14) DIV 10-1
+253 IF net_delay%<2 THEN net_delay%=2
+254 IF net_delay%>6 THEN net_delay%=6:REM Past this, a game slows down rather than feel any worse. net_qin%() must hold net_delay%+1 frames
+255 ?net_io%=net_delay%:PROCnet_send(net_io%,1)
+256 ELSE
+257 PROCnet_recv(net_io%,1):IF net_why$<>"" THEN ENDPROC
+258 net_delay%=?net_io%
+259 IF net_delay%<2 OR net_delay%>6 THEN net_why$="The other player has a different version of Cavern Duel"
+260 ENDIF
+261 ENDPROC
