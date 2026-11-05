@@ -72,6 +72,13 @@
       "problemMatcher": []
     },
     {
+      "label": "Test relay",
+      "detail": "Run the tests for the internet relay, tools/relay.py",
+      "type": "shell",
+      "command": "python3 tools/test_relay.py",
+      "problemMatcher": []
+    },
+    {
       "label": "Test tokeniser",
       "type": "shell",
       "command": "python3 tools/test_bbcbasic.py",

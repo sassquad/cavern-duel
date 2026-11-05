@@ -107,6 +107,64 @@ python3 tools/netpeer.py relay --lag 150 --jitter 30 --spike 200
 Every 5 seconds the relay prints the game's speed in frames a second, which should
 stay at about 20.
 
+## The internet relay
+
+`tools/relay.py` is the program for playing over the internet: it runs on a server
+with a public address, and needs only Python 3.8 or later. Both players connect
+out to it, so neither needs a port forwarded. The game doesn't use it yet: that's
+the next step.
+
+The relay pairs players by a four-letter room code, then passes everything between
+them without looking at it. It keeps nothing on disc and logs no addresses. So that
+it's safe to leave running, it has these limits, set at the top of the file:
+
+| Limit | Value |
+|---|---|
+| Time to say whether you're hosting or joining | 10 seconds |
+| Time for the other player to arrive | 15 minutes |
+| Silence from both players before a game is dropped | 30 seconds |
+| Length of one game | 4 hours |
+| Connections at once, from everyone | 500 |
+| Connections at once, from one address | 6 |
+| Rooms waiting, from one address | 3 |
+| Wrong codes a minute, from one address | 10 |
+| Data from one player | 64 KB at once, then 1 KB a second |
+
+To try it with pretend players, start the relay and a host, which prints a code:
+
+```bash
+python3 tools/relay.py
+```
+
+```bash
+python3 tools/netpeer.py host 127.0.0.1 --room
+```
+
+Then join with that code:
+
+```bash
+python3 tools/netpeer.py join 127.0.0.1 --room ABCD
+```
+
+The **Test relay** task in VS Code runs its tests. A hundred pretend games at once
+took about 20% of one Mac Studio core, including the pretend players, and under 30
+MB of memory.
+
+### Talking to the relay
+
+This comes before the game's own protocol, below, which then runs unchanged.
+
+1. A host sends `CDRH` and the relay protocol's version, 1, as one byte. The relay
+   answers `CDRC` and the room code. Anything the host sends next waits for the
+   other player, up to 1 KB.
+2. A joiner sends `CDRJ`, the version and the four letters of the code. The relay
+   answers `CDRY`, and from then on passes everything between them.
+
+Instead of those answers, the relay can send `CDRN` (no such room), `CDRB` (too
+busy, or a limit has been reached) or `CDRV` (a version it doesn't know), and it
+closes the connection. It also closes a connection to end a game, and when a room
+runs out of time.
+
 ## The protocol
 
 TCP, port 30123 by default.

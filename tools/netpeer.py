@@ -9,15 +9,16 @@
         To imitate the internet, each direction can be held up by --lag, up to
         --jitter more at random, and --spike more on 5% of its traffic.
 
-    netpeer.py host [address[:port]] [--port 30123] [--frames N] [--cave FILE] [--settings F,W,T,S]
-    netpeer.py join address[:port] [--frames N]
+    netpeer.py host [address[:port]] [--port 30123] [--frames N] [--cave FILE] [--settings F,W,T,S] [--room]
+    netpeer.py join address[:port] [--frames N] [--room CODE]
         Play against one copy of the game with a pretend opponent that
         wanders about and fires now and then, printing what the game sends.
         "host" with no address waits for the game to connect (click Join and
         type 100.64.0.1 in RPCEmu); with an address it connects out, to a relay
         or to a game behind a port forward. It sends the Default cave and the
         menu's starting settings unless given others, which can be used to
-        try sending the game bad ones.
+        try sending the game bad ones. With --room, the address is a relay.py,
+        and it prints the room code to join with.
 
 The protocol is described at the top of src/!CavenDuel/Net.bas.
 """
@@ -64,6 +65,19 @@ def connect(addr):
     conn.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
     print(f"connected to {addr[0]}:{addr[1]}", flush=True)
     return conn
+
+
+def enter_room(conn, code):
+    """Say hello to relay.py: code is a room to join, or None to host one."""
+    if code is None:
+        conn.sendall(b"CDRH\x01")
+    else:
+        conn.sendall(b"CDRJ\x01" + code.upper().encode())
+    answer = recv_exact(conn, 4)
+    if code is None and answer == b"CDRC":
+        print(f"room code {recv_exact(conn, 4).decode()}", flush=True)
+    elif answer != b"CDRY":
+        sys.exit(f"the relay said {answer}")
 
 
 def recv_exact(conn, n):
@@ -229,6 +243,7 @@ def main(argv):
     parser.add_argument("--lag", type=int, default=0)
     parser.add_argument("--jitter", type=int, default=0)
     parser.add_argument("--spike", type=int, default=0)
+    parser.add_argument("--room", nargs="?", const="", default=None)
     parser.add_argument("--cave", default=CAVE)
     parser.add_argument("--settings", type=lambda s: tuple(int(n) for n in s.split(",")), default=SETTINGS)
     args = parser.parse_args(argv[1:])
@@ -236,7 +251,10 @@ def main(argv):
         if args.role == "relay":
             relay(args.port, args.lag, args.jitter, args.spike)
         elif args.address:
-            opponent(args.role, connect(address(args.address)), args.frames, args.cave, args.settings)
+            conn = connect(address(args.address))
+            if args.room is not None:
+                enter_room(conn, args.room or None)
+            opponent(args.role, conn, args.frames, args.cave, args.settings)
         elif args.role == "host":
             server = listen(args.port)
             print(f"waiting for the game on port {args.port}", flush=True)
