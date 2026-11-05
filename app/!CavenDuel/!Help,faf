@@ -167,13 +167,16 @@
     <p>Note that the current game is reset when you return to the
         main menu, so don't use it unless you <strong>have</strong> to! <a href="#toc"><em>Back to top</em></a></p>
     <h3><a name="network_play" id="network_play"></a>Playing over a network </h3>
-    <p>Two players can each play on their own machine, connected over a network. The game needs the Internet module to
-        be running on both machines.</p>
+    <p>Two players can each play on their own machine, on a home network or over the internet. The game needs the
+        Internet module to be running on both machines.</p>
     <ol>
-        <li>One player chooses the settings and cave, then clicks <strong>Host</strong>. Their address appears along the
-            bottom of the menu.</li>
-        <li>The other player clicks <strong>Join</strong>, types that address and presses Return.</li>
+        <li>One player chooses the settings and cave, then clicks <strong>Host</strong>. They press H to play on their
+            home network, and their address appears along the bottom of the menu. Or they press I to play over the
+            internet, and a four-letter room code appears instead.</li>
+        <li>The other player clicks <strong>Join</strong>, types that address or room code and presses Return.</li>
     </ol>
+    <p>Over the internet, both machines connect out to the Cavern Duel relay, so there's nothing to set up on your
+        router. A room closes if nobody joins it within 15 minutes.</p>
     <p>The game starts on both machines with the host's settings and cave. The host plays Player 1 and the other player
         plays Player 2, on either set of keys; a message before the game says which you are. Tab cancels while
         connecting and ends the game for both players. Pause is switched off in a network game. <a href="#toc"><em>Back to top</em></a></p>

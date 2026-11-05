@@ -1,7 +1,7 @@
 # Network play
 
-Two players on two machines, each seeing the usual split screen. Steps 1 to 4 of
-the plan are done.
+Two players on two machines, each seeing the usual split screen, on a home
+network or over the internet. Steps 1 to 4 of the plan are done.
 
 1. Read every key once a frame into `pad%()` and `ctl%` (`PROCreadkeys`).
 2. Use the game's own seeded random numbers (`FNrnd`) instead of `RND`.
@@ -9,20 +9,30 @@ the plan are done.
    for testing from the Mac.
 4. Host and Join buttons on the menu, with the host's settings and cave sent
    to the other player.
-5. **Still to do:** testing on real machines on a LAN, then over the internet.
+5. **Still to do:** testing on real machines on a LAN, and putting the internet
+   relay on a server, then trying it over the internet.
 
 ## Playing
 
-1. One player sets up the menu and cave as they like, then clicks **Host**. The
-   strip along the bottom of the menu shows their address.
-2. The other player clicks **Join**, types that address and presses Return.
+1. One player sets up the menu and cave as they like, then clicks **Host**, and
+   presses H for the home network or I for the internet. On a home network, the
+   strip along the bottom of the menu shows their address. Over the internet, it
+   shows a four-letter room code.
+2. The other player clicks **Join**, types that address or room code and presses
+   Return.
 
 The game starts on both machines with the host's settings and cave, after a
 message saying which player you are: the host plays Player 1, the other player
 Player 2. Tab cancels
-at any point before then. Join remembers the address until the machine restarts,
-and keeps trying every second if the host isn't ready yet. Addresses must be
-numbers; add `:port` if the host isn't on port 30123.
+at any point before then. Join remembers what was typed until the machine
+restarts, and keeps trying every second if the host isn't ready yet. An address can
+be numbers or a name; add `:port` if the host isn't on port 30123. Four letters on
+their own are taken as a room code, in either case.
+
+Over the internet, both machines connect out to the relay at
+`cavernduel.sassquad.net`, so neither player needs to forward a port. To use
+another relay, set `CavernDuel$Server` to its address before running the game.
+The relay closes a room if nobody joins within 15 minutes.
 
 ## How it works
 
@@ -111,8 +121,8 @@ stay at about 20.
 
 `tools/relay.py` is the program for playing over the internet: it runs on a server
 with a public address, and needs only Python 3.8 or later. Both players connect
-out to it, so neither needs a port forwarded. The game doesn't use it yet: that's
-the next step.
+out to it, so neither needs a port forwarded. The game looks for it at
+`cavernduel.sassquad.net`, or at `CavernDuel$Server` if that's set.
 
 The relay pairs players by a four-letter room code, then passes everything between
 them without looking at it. It keeps nothing on disc and logs no addresses. So that
@@ -145,6 +155,12 @@ Then join with that code:
 ```bash
 python3 tools/netpeer.py join 127.0.0.1 --room ABCD
 ```
+
+To try it with the game in RPCEmu, start the relay on the Mac, and on each
+machine press F12 and type `*Set CavernDuel$Server 100.64.0.1` before running the
+game. Host with I on one, and join with the room code on the other. A game between
+RISC OS 5.27 and 3.71 this way stayed in step, and a wrong code, a cancelled room
+and a server that isn't a relay each gave a clear message.
 
 The **Test relay** task in VS Code runs its tests. A hundred pretend games at once
 took about 20% of one Mac Studio core, including the pretend players, and under 30

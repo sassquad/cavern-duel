@@ -374,7 +374,7 @@
 376 ENDPROC
 377 :
 378 DEF PROCmouse
-379 IF screen=1 AND INKEY-99:PROCstartgame(0,""):ENDPROC
+379 IF screen=1 AND INKEY-99:PROCstartgame(0,"",""):ENDPROC
 380 LOCAL MX%,MY%,but%
 381 MOUSE MX%,MY%,but%
 382 IF but%=0 THEN ENDPROC
@@ -1389,14 +1389,14 @@
 1398 =(rnd%>>>1) MOD n%+1
 1399 :
 1400 DEF PROCstartbutton:REM Play, Host or Join on the menu has been clicked
-1401 IF play PROCstartgame(0,""):ENDPROC
-1402 IF host PROCstartgame(1,FNnet_var("CavernDuel$Relay")):ENDPROC
+1401 IF play PROCstartgame(0,"",""):ENDPROC
+1402 IF host PROChost:ENDPROC
 1403 PROCjoin
 1404 ENDPROC
 1405 :
-1406 DEF PROCstartgame(role%,address$):REM Connect first if this is a network game, then play
+1406 DEF PROCstartgame(role%,address$,room$):REM Connect first if this is a network game, then play. room$ is for the internet relay, as FNnet_connect
 1407 LOCAL x%,y%,b%
-1408 IF FNnet_connect(role%,address$,TIME) AND role%<>0 THEN PROCsharecave
+1408 IF FNnet_connect(role%,address$,room$,TIME) AND role%<>0 THEN PROCsharecave
 1409 IF FNnet_lost THEN
 1410 IF FNnet_why="Cancelled" THEN PROCclearstatus ELSE PROCuser_netstatus(FNnet_why)
 1411 PROCnet_close
@@ -1408,26 +1408,26 @@
 1417 PROCnet_close
 1418 ENDPROC
 1419 :
-1420 DEF PROCjoin:REM Ask for the host's address, and remember it for next time
-1421 LOCAL a$
+1420 DEF PROCjoin:REM Ask for the host's address or room code, and remember it for next time
+1421 LOCAL a$,c$
 1422 a$=FNaskaddress
 1423 IF a$="" THEN PROCclearstatus:ENDPROC
 1424 SYS "XOS_CLI","Set CavernDuel$Address "+a$
-1425 PROCstartgame(2,a$)
+1425 c$=FNroomcode(a$):IF c$<>"" THEN PROCstartgame(2,FNserver,c$) ELSE PROCstartgame(2,a$,"")
 1426 ENDPROC
 1427 :
-1428 DEF FNaskaddress:REM Type an address in the strip along the bottom of the menu; "" if cancelled
+1428 DEF FNaskaddress:REM Type an address or room code in the strip along the bottom of the menu; "" if cancelled
 1429 LOCAL a$,k%,x%,y%,b%
 1430 a$=FNnet_var("CavernDuel$Address")
 1431 REPEAT:MOUSE x%,y%,b%:UNTIL b%=0
 1432 SYS "OS_Byte",15,0
 1433 REPEAT
-1434 PROCuser_netstatus("Host's address: "+a$+"_  - Return connects, Tab cancels")
+1434 PROCuser_netstatus("Host's address or room code: "+a$+"_  (Tab cancels)")
 1435 REPEAT:PROCdronening:k%=INKEY(10):UNTIL k%>=0
 1436 CASE k% OF
 1437 WHEN 8,127:a$=LEFT$(a$,LEN(a$)-1)
 1438 WHEN 9:=""
-1439 WHEN 46,48,49,50,51,52,53,54,55,56,57,58:IF LEN(a$)<21 THEN a$+=CHR$k%
+1439 OTHERWISE:IF LEN(a$)<30 AND FNaddrchar(k%) THEN a$+=CHR$k%
 1440 ENDCASE
 1441 UNTIL k%=13 AND a$<>""
 1442 =a$
@@ -1475,7 +1475,7 @@
 1484 ENDPROC
 1485 :
 1486 DEF PROCuser_netstatus(text$):REM Network messages go in a strip along the bottom of the menu
-1487 GCOL7:RECTANGLE FILL0,0,1280,112:PROCsize(8,8):PROCshadow(text$,640-LEN(text$)*8,72,0,0):PROCsize(32,8):REM Back to the size the menu draws its numbers in
+1487 text$=LEFT$(text$,79):GCOL7:RECTANGLE FILL0,0,1280,112:PROCsize(8,8):PROCshadow(text$,640-LEN(text$)*8,72,0,0):PROCsize(32,8):REM Back to the size the menu draws its numbers in
 1488 ENDPROC
 1489 :
 1490 DEF PROCshowside:REM A moment to see which player this machine plays, before the first frame
@@ -1510,3 +1510,37 @@
 1519 i%+=1
 1520 NEXT
 1521 =i%=n% AND tele%<=20 AND obj%<=200 AND p1%=1 AND p2%=1
+1522 :
+1523 DEF PROChost:REM Host on the home network, or through the internet relay, which gives a room code to pass on
+1524 CASE FNaskwhere OF
+1525 WHEN "H":PROCstartgame(1,FNnet_var("CavernDuel$Relay"),"")
+1526 WHEN "I":PROCstartgame(1,FNserver,"+")
+1527 OTHERWISE:PROCclearstatus
+1528 ENDCASE
+1529 ENDPROC
+1530 :
+1531 DEF FNaskwhere:REM "H" for the home network, "I" for the internet, "" if cancelled
+1532 LOCAL k%,x%,y%,b%
+1533 REPEAT:MOUSE x%,y%,b%:UNTIL b%=0
+1534 SYS "OS_Byte",15,0
+1535 PROCuser_netstatus("Host on your home network (H) or the internet (I)?  (Tab cancels)")
+1536 REPEAT:PROCdronening:k%=INKEY(10) OR 32:UNTIL k%=104 OR k%=105 OR k%=41:REM h, i or Tab, either case
+1537 IF k%=41 THEN =""
+1538 =CHR$(k%-32)
+1539 :
+1540 DEF FNserver:REM Where the internet relay is: CavernDuel$Server, if set, for testing
+1541 LOCAL s$
+1542 s$=FNnet_var("CavernDuel$Server"):IF s$="" THEN s$="cavernduel.sassquad.net"
+1543 =s$
+1544 :
+1545 DEF FNroomcode(a$):REM a$ in capitals if it's a room code (four letters), otherwise ""
+1546 LOCAL i%,k%,c$
+1547 IF LEN(a$)<>4 THEN =""
+1548 FOR i%=1 TO 4
+1549 k%=ASC(MID$(a$,i%,1)) AND &DF:IF k%<65 OR k%>90 THEN =""
+1550 c$+=CHR$k%
+1551 NEXT
+1552 =c$
+1553 :
+1554 DEF FNaddrchar(k%):REM Can k% be part of an address, a name or a room code?
+1555 =(k%>=48 AND k%<=58) OR k%=45 OR k%=46 OR (k%>=65 AND k%<=90) OR (k%>=97 AND k%<=122)
