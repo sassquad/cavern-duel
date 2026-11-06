@@ -1,7 +1,7 @@
 # Network play
 
-Two players on two machines, each seeing the usual split screen. Steps 1 to 4 of
-the plan are done.
+Two players on two machines, each seeing the usual split screen, on a home
+network or over the internet. Steps 1 to 4 of the plan are done.
 
 1. Read every key once a frame into `pad%()` and `ctl%` (`PROCreadkeys`).
 2. Use the game's own seeded random numbers (`FNrnd`) instead of `RND`.
@@ -9,20 +9,30 @@ the plan are done.
    for testing from the Mac.
 4. Host and Join buttons on the menu, with the host's settings and cave sent
    to the other player.
-5. **Still to do:** testing on real machines on a LAN, then over the internet.
+5. **Still to do:** testing on real machines on a LAN, and putting the internet
+   relay on a server, then trying it over the internet.
 
 ## Playing
 
-1. One player sets up the menu and cave as they like, then clicks **Host**. The
-   strip along the bottom of the menu shows their address.
-2. The other player clicks **Join**, types that address and presses Return.
+1. One player sets up the menu and cave as they like, then clicks **Host**, and
+   presses H for the home network or I for the internet. On a home network, the
+   strip along the bottom of the menu shows their address. Over the internet, it
+   shows a four-letter room code.
+2. The other player clicks **Join**, types that address or room code and presses
+   Return.
 
 The game starts on both machines with the host's settings and cave, after a
 message saying which player you are: the host plays Player 1, the other player
 Player 2. Tab cancels
-at any point before then. Join remembers the address until the machine restarts,
-and keeps trying every second if the host isn't ready yet. Addresses must be
-numbers; add `:port` if the host isn't on port 30123.
+at any point before then. Join remembers what was typed until the machine
+restarts, and keeps trying every second if the host isn't ready yet. An address can
+be numbers or a name; add `:port` if the host isn't on port 30123. Four letters on
+their own are taken as a room code, in either case.
+
+Over the internet, both machines connect out to the relay at
+`cavernduel.sassquad.net`, so neither player needs to forward a port. To use
+another relay, set `CavernDuel$Server` to its address before running the game.
+The relay closes a room if nobody joins within 15 minutes.
 
 ## How it works
 
@@ -33,9 +43,11 @@ both screens stay identical. The host plays player 1 and picks the seed;
 whoever joins plays player 2. On either machine you can use either set of
 keys.
 
-Controls take effect two frames (a tenth of a second) after they're sent,
-on both machines at once, so ordinary network lag doesn't slow the game
-down. If the checks ever differ, the games have drifted apart, and both stop
+Controls take effect a few frames after they're sent, on both machines at once,
+so ordinary network lag doesn't slow the game down. The host times the connection
+before the game and picks this delay for both machines: two frames (a tenth of a
+second) on a good connection, up to six on a slow one. A connection too slow even
+for that slows the game down rather than stopping it. If the checks ever differ, the games have drifted apart, and both stop
 with a message saying so.
 
 In a network game, pause is switched off (it would freeze the other player
@@ -92,23 +104,105 @@ guest operating system using that link hasn't been demonstrated.
 A game between RISC OS 5 and RISC OS 3.71 through the relay stayed in step for
 about 1,150 frames with both players moving and firing.
 
+### Imitating the internet
+
+The relay can hold up the game's traffic, to try it on a poor connection. Each
+direction is held up by `--lag` milliseconds, up to `--jitter` more at random, and
+`--spike` more on 5% of its traffic:
+
+```bash
+python3 tools/netpeer.py relay --lag 150 --jitter 30 --spike 200
+```
+
+Every 5 seconds the relay prints the game's speed in frames a second, which should
+stay at about 20.
+
+## The internet relay
+
+`tools/relay.py` is the program for playing over the internet: it runs on a server
+with a public address, and needs only Python 3.8 or later. Both players connect
+out to it, so neither needs a port forwarded. The game looks for it at
+`cavernduel.sassquad.net`, or at `CavernDuel$Server` if that's set.
+
+The relay pairs players by a four-letter room code, then passes everything between
+them without looking at it. It keeps nothing on disc and logs no addresses. So that
+it's safe to leave running, it has these limits, set at the top of the file:
+
+| Limit | Value |
+|---|---|
+| Time to say whether you're hosting or joining | 10 seconds |
+| Time for the other player to arrive | 15 minutes |
+| Silence from both players before a game is dropped | 30 seconds |
+| Length of one game | 4 hours |
+| Connections at once, from everyone | 500 |
+| Connections at once, from one address | 6 |
+| Rooms waiting, from one address | 3 |
+| Wrong codes a minute, from one address | 10 |
+| Data from one player | 64 KB at once, then 1 KB a second |
+
+To try it with pretend players, start the relay and a host, which prints a code:
+
+```bash
+python3 tools/relay.py
+```
+
+```bash
+python3 tools/netpeer.py host 127.0.0.1 --room
+```
+
+Then join with that code:
+
+```bash
+python3 tools/netpeer.py join 127.0.0.1 --room ABCD
+```
+
+To try it with the game in RPCEmu, start the relay on the Mac, and on each
+machine press F12 and type `*Set CavernDuel$Server 100.64.0.1` before running the
+game. Host with I on one, and join with the room code on the other. A game between
+RISC OS 5.27 and 3.71 this way stayed in step, and a wrong code, a cancelled room
+and a server that isn't a relay each gave a clear message.
+
+The **Test relay** task in VS Code runs its tests. A hundred pretend games at once
+took about 20% of one Mac Studio core, including the pretend players, and under 30
+MB of memory.
+
+### Talking to the relay
+
+This comes before the game's own protocol, below, which then runs unchanged.
+
+1. A host sends `CDRH` and the relay protocol's version, 1, as one byte. The relay
+   answers `CDRC` and the room code. Anything the host sends next waits for the
+   other player, up to 1 KB.
+2. A joiner sends `CDRJ`, the version and the four letters of the code. The relay
+   answers `CDRY`, and from then on passes everything between them.
+
+Instead of those answers, the relay can send `CDRN` (no such room), `CDRB` (too
+busy, or a limit has been reached) or `CDRV` (a version it doesn't know), and it
+closes the connection. It also closes a connection to end a game, and when a room
+runs out of time.
+
 ## The protocol
 
 TCP, port 30123 by default.
 
-1. Greeting. The host sends `CDH`, the version (2) and the seed as 4 bytes
+1. Greeting. The host sends `CDH`, the version (3) and the seed as 4 bytes
    little-endian. The joiner sends `CDJ` and the version. Each checks the
    other's greeting.
-2. The host sends five 4-byte little-endian numbers (the length of the cave
-   file, then food, weapons, teleports and shields), then the cave file. Both
-   machines then load that cave afresh.
-3. Each side sends two empty frames, the padding for the two-frame delay.
-4. Every frame, each side sends two bytes:
+2. Five times, the host sends one byte and the joiner sends one back. From the
+   slowest of these, in centiseconds, the host works out the delay:
+   `(slowest + 14) DIV 10 - 1`, kept between 2 and 6 frames. It sends the delay as
+   one byte.
+3. The host sends five 4-byte little-endian numbers (the length of the cave
+   file, then food, weapons, teleports and shields), then the cave file. The
+   joiner checks them against the menu's limits and the cave format, and leaves
+   the game if they aren't valid. Both machines then load that cave afresh.
+4. Each side sends as many empty frames as the delay, as padding.
+5. Every frame, each side sends two bytes:
    - **Controls:** 1 left, 2 right, 4 up, 8 down, 16 fire, 32 quit,
      64 skip winner.
    - **Check:** 1–128 from the game's state, or 0 for no check.
 
-   The frame each side receives is the other's frame from two frames ago.
+   The frame each side receives is the other's frame from that many frames ago.
    That is the one both machines play now.
 
 The connection closes when the game ends.

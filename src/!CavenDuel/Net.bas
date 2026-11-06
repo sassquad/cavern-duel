@@ -2,27 +2,27 @@
 2 REM Cavern Duel network play, loaded by Game with LIBRARY
 3 REM Both machines run the whole game in lockstep and swap each player's controls every frame over TCP.
 4 REM The host plays player 1 and picks the random seed; whoever joins plays player 2.
-5 REM The Host and Join buttons on the menu start a game. An address is a numeric IP address, with :<port> on the end if it isn't 30123.
-6 REM If CavernDuel$Relay holds an address, Host connects out to a relay there (tools/netpeer.py) instead of waiting on port 30123.
+5 REM The Host and Join buttons on the menu start a game. An address is a numeric IP address or a name, with :<port> on the end if it isn't 30123.
+6 REM If CavernDuel$Relay holds an address, Host connects out to a relay there (tools/netpeer.py) instead of waiting on port 30123. Over the internet, both connect to tools/relay.py, which pairs them by a room code.
 7 REM Each frame each side sends two bytes: its controls (1 left, 2 right, 4 up, 8 down, 16 fire, 32 quit, 64 skip winner)
-8 REM and a check of the game's state (0 for no check). Controls take effect net_delay% frames after they are sent,
+8 REM and a check of the game's state (0 for no check). Controls take effect net_delay% frames after they are sent (the host times the connection and picks this),
 9 REM on both machines at once, so a little network lag doesn't slow the game down.
 10 :
 11 DEF PROCnet_init
 12 DIM net_addr% 15,net_io% 63,net_ifs% 255,net_qin%(7),net_qck%(7)
-13 net_sock%=-1:net_listen%=-1:net_player%=0:net_seed%=0:net_frame%=0:net_why$=""
-14 net_port%=30123:net_delay%=2:net_version%=2:net_wait%=1000
+13 net_sock%=-1:net_listen%=-1:net_player%=0:net_seed%=0:net_frame%=0:net_why$="":net_room$=""
+14 net_port%=30123:net_delay%=2:net_version%=3:net_wait%=1000
 15 ENDPROC
 16 :
-17 DEF FNnet_connect(role%,host$,seed%):REM role% 0 for a game on one machine, 1 to host, 2 to join; TRUE once ready to play. host$ is who to connect to, "" for a host to wait
+17 DEF FNnet_connect(role%,host$,room$,seed%):REM role% 0 for one machine, 1 to host, 2 to join; TRUE once ready. host$ is who to connect to, "" for a host to wait. room$ is for the internet relay: "+" opens a room, a code joins one
 18 LOCAL i%,f%
-19 PROCnet_close:net_why$="":net_seed%=seed%:net_player%=0
+19 PROCnet_close:net_why$="":net_seed%=seed%:net_player%=0:net_room$=room$
 20 IF role%=0 THEN =TRUE
 21 SYS "XOS_SWINumberFromString",,"Socket_Creat" TO ;f%
 22 IF f% AND 1 THEN net_why$="No network: the Internet module isn't loaded":=FALSE
 23 net_port%=30123:i%=INSTR(host$,":"):IF i% THEN net_port%=VAL(MID$(host$,i%+1)):host$=LEFT$(host$,i%-1)
 24 net_player%=role%
-25 IF host$="" THEN PROCnet_accept ELSE PROCnet_dial(host$)
+25 IF host$="" THEN PROCnet_accept ELSE PROCnet_dial(host$):IF net_why$="" AND net_room$<>"" THEN PROCnet_enterroom
 26 IF net_why$="" THEN PROCnet_hello
 27 IF net_why$="" THEN =TRUE
 28 PROCnet_close:net_player%=0
@@ -93,7 +93,7 @@
 93 :
 94 DEF PROCnet_dial(host$):REM Connect to the host or relay, trying again every second until it answers; the status line says why each try failed
 95 LOCAL e%,f%,n%,t%,try%,why$
-96 IF FNnet_ip(host$)=FALSE THEN net_why$="Use a numeric address, like 192.168.1.20, not "+host$:ENDPROC
+96 IF FNnet_lookup(host$)=FALSE THEN ENDPROC
 97 REPEAT
 98 try%+=1:PROCuser_netstatus("Connecting to "+host$+":"+STR$net_port%+" (try "+STR$try%+why$+") - Tab cancels")
 99 net_sock%=FNnet_socket:IF net_sock%<0 THEN ENDPROC
@@ -143,16 +143,16 @@
 143 ENDPROC
 144 :
 145 DEF PROCnet_hello:REM Swap greetings; the host sends its seed so both machines lay out the same game. No time limit: through a relay, the other player may not have connected yet
-146 PROCuser_netstatus("Connected - waiting for the other player - Tab cancels")
+146 IF net_player%=2 OR net_room$="" THEN PROCuser_netstatus("Connected - waiting for the other player - Tab cancels"):REM A host in a room keeps its code on show
 147 net_wait%=&7FFFFFFF:$net_io%="CD"+MID$("HJ",net_player%,1):net_io%?3=net_version%:net_io%!4=net_seed%
 148 IF net_player%=1 THEN PROCnet_send(net_io%,8) ELSE PROCnet_send(net_io%,4)
 149 IF net_player%=1 THEN PROCnet_recv(net_io%,4) ELSE PROCnet_recv(net_io%,8)
-150 net_wait%=1000:IF net_why$<>"" THEN ENDPROC
+150 net_wait%=1000:PROCnet_nohello:IF net_why$<>"" THEN ENDPROC
 151 IF ?net_io%<>67 OR net_io%?1<>68 THEN net_why$="The other end isn't Cavern Duel":ENDPROC
 152 IF net_io%?2=ASC(MID$("HJ",net_player%,1)) THEN net_why$="Both players are set to "+MID$("hostjoin",net_player%*4-3,4):ENDPROC
 153 IF net_io%?3<>net_version% THEN net_why$="The other player has a different version of Cavern Duel":ENDPROC
 154 IF net_player%=2 THEN net_seed%=net_io%!4
-155 ENDPROC
+155 PROCnet_setdelay:ENDPROC
 156 :
 157 DEF PROCnet_send(p%,n%):REM Send n% bytes from p%
 158 LOCAL done%,r%,f%,t%
@@ -239,3 +239,55 @@
 239 LOCAL p%,s$
 240 p%=e%+4:WHILE ?p%>=32:s$+=CHR$?p%:p%+=1:ENDWHILE
 241 =s$
+242 :
+243 DEF PROCnet_setdelay:REM Five round trips of one byte, timed by the host, which then sends the delay to use. A frame reaches the game in time if it takes under net_delay%+1 frames each way, with a frame to spare here
+244 LOCAL i%,t%,worst%
+245 FOR i%=1 TO 5
+246 t%=TIME
+247 IF net_player%=1 THEN PROCnet_send(net_io%,1):PROCnet_recv(net_io%,1) ELSE PROCnet_recv(net_io%,1):PROCnet_send(net_io%,1)
+248 IF TIME-t%>worst% THEN worst%=TIME-t%
+249 NEXT
+250 IF net_why$<>"" THEN ENDPROC
+251 IF net_player%=1 THEN
+252 net_delay%=(worst%+14) DIV 10-1
+253 IF net_delay%<2 THEN net_delay%=2
+254 IF net_delay%>6 THEN net_delay%=6:REM Past this, a game slows down rather than feel any worse. net_qin%() must hold net_delay%+1 frames
+255 ?net_io%=net_delay%:PROCnet_send(net_io%,1)
+256 ELSE
+257 PROCnet_recv(net_io%,1):IF net_why$<>"" THEN ENDPROC
+258 net_delay%=?net_io%
+259 IF net_delay%<2 OR net_delay%>6 THEN net_why$="The other player has a different version of Cavern Duel"
+260 ENDIF
+261 ENDPROC
+262 :
+263 DEF PROCnet_enterroom:REM Tell the internet relay to open a room, or which room to join. Then the usual greeting goes through it
+264 LOCAL a$
+265 IF net_room$="+" THEN $net_io%="CDRH":net_io%?4=1:PROCnet_send(net_io%,5) ELSE $net_io%="CDRJ":net_io%?4=1:$(net_io%+5)=net_room$:PROCnet_send(net_io%,9)
+266 PROCnet_recv(net_io%,4):IF net_why$<>"" THEN ENDPROC
+267 net_io%?4=13:a$=$net_io%
+268 CASE a$ OF
+269 WHEN "CDRC":PROCnet_recv(net_io%,4):IF net_why$="" THEN net_io%?4=13:net_room$=$net_io%:PROCuser_netstatus("Your room code is "+net_room$+" - give it to player 2 - Tab cancels")
+270 WHEN "CDRY":
+271 WHEN "CDRN":net_why$="There's no room "+net_room$+" - check the code with the host"
+272 WHEN "CDRB":IF net_room$="+" THEN net_why$="The relay is busy, or you have too many rooms open - try again later" ELSE net_why$="The relay is busy - try again later"
+273 WHEN "CDRV":net_why$="The relay needs a different version of Cavern Duel"
+274 OTHERWISE:net_why$="That isn't a Cavern Duel relay"
+275 ENDCASE
+276 ENDPROC
+277 :
+278 DEF PROCnet_nohello:REM Tab before the game starts cancels it. The relay closes a room nobody joins after 15 minutes, which otherwise looks like the other player leaving
+279 IF net_why$="You left the game" THEN net_why$="Cancelled"
+280 IF net_player%=1 AND net_room$<>"" AND net_why$="The other player left the game" THEN net_why$="Room "+net_room$+" closed - nobody joined in time"
+281 ENDPROC
+282 :
+283 DEF FNnet_lookup(name$):REM Put name$, a numeric address or a name, and net_port% into net_addr%; FALSE, saying why, if it can't be found
+284 LOCAL r%,h%,f%,i%
+285 IF FNnet_ip(name$) THEN =TRUE
+286 SYS "XOS_SWINumberFromString",,"Resolver_GetHostByName" TO ;f%
+287 IF f% AND 1 THEN net_why$="Can't look up "+name$+" - the Resolver module isn't loaded":=FALSE
+288 PROCuser_netstatus("Looking up "+name$)
+289 SYS "XResolver_GetHostByName",,name$ TO r%,h%;f%:REM Waits for the answer. Resolver_GetHost, which doesn't, gave -1 for every name on RISC OS 5.27
+295 IF (f% AND 1) OR r%<>0 OR h%=0 THEN net_why$="Can't find "+name$+" - is the name right, and is the network on?":=FALSE
+296 IF h%!8<>2 OR h%!12<>4 THEN net_why$="Can't find "+name$:=FALSE
+297 h%=!(h%!16):FOR i%=0 TO 3:net_addr%?(4+i%)=h%?i%:NEXT:REM The first of its addresses
+298 =TRUE

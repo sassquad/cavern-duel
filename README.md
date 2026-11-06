@@ -28,6 +28,8 @@ tools/
   import_zip.py         unpacks a RISC OS zip into app/ + src/
   test_bbcbasic.py      tokeniser tests
   netpeer.py            pretend player and relay for testing network play
+  relay.py              pairs players by room code, for games over the internet
+  test_relay.py         relay tests
   setup_rpcemu.sh       installs RPCEmu Extended and the three machines
   rpcemu.sh             starts a machine on RISC OS 5.27, 5.30 or 3.71
 docs/rpcemu-setup.md    RPCEmu Extended installation guide
