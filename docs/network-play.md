@@ -9,8 +9,7 @@ network or over the internet. Steps 1 to 4 of the plan are done.
    for testing from the Mac.
 4. Host and Join buttons on the menu, with the host's settings and cave sent
    to the other player.
-5. **Still to do:** testing on real machines on a LAN, and putting the internet
-   relay on a server, then trying it over the internet.
+5. **Still to do:** testing on real machines, on a LAN and over the internet.
 
 ## Playing
 
@@ -124,6 +123,11 @@ with a public address, and needs only Python 3.8 or later. Both players connect
 out to it, so neither needs a port forwarded. The game looks for it at
 `relay.sassquad.net`, or at `CavernDuel$Server` if that's set.
 [relay-server.md](relay-server.md) explains how to set it up on a server.
+
+Through the relay at `relay.sassquad.net`, a game in RPCEmu on RISC OS 5.27 played
+one on 5.30, and another played 3.71, with both screens staying identical. Both
+emulators were on the same Mac, connecting out to the VPS, about 20 ms there and
+back.
 
 The relay pairs players by a four-letter room code, then passes everything between
 them without looking at it. It keeps nothing on disc and logs no addresses. So that
