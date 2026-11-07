@@ -1530,7 +1530,7 @@
 1539 :
 1540 DEF FNserver:REM Where the internet relay is: CavernDuel$Server, if set, for testing
 1541 LOCAL s$
-1542 s$=FNnet_var("CavernDuel$Server"):IF s$="" THEN s$="cavernduel.sassquad.net"
+1542 s$=FNnet_var("CavernDuel$Server"):IF s$="" THEN s$="relay.sassquad.net"
 1543 =s$
 1544 :
 1545 DEF FNroomcode(a$):REM a$ in capitals if it's a room code (four letters), otherwise ""

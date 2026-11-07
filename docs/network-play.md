@@ -30,7 +30,7 @@ be numbers or a name; add `:port` if the host isn't on port 30123. Four letters 
 their own are taken as a room code, in either case.
 
 Over the internet, both machines connect out to the relay at
-`cavernduel.sassquad.net`, so neither player needs to forward a port. To use
+`relay.sassquad.net`, so neither player needs to forward a port. To use
 another relay, set `CavernDuel$Server` to its address before running the game.
 The relay closes a room if nobody joins within 15 minutes.
 
@@ -122,7 +122,8 @@ stay at about 20.
 `tools/relay.py` is the program for playing over the internet: it runs on a server
 with a public address, and needs only Python 3.8 or later. Both players connect
 out to it, so neither needs a port forwarded. The game looks for it at
-`cavernduel.sassquad.net`, or at `CavernDuel$Server` if that's set.
+`relay.sassquad.net`, or at `CavernDuel$Server` if that's set.
+[relay-server.md](relay-server.md) explains how to set it up on a server.
 
 The relay pairs players by a four-letter room code, then passes everything between
 them without looking at it. It keeps nothing on disc and logs no addresses. So that
