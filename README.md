@@ -30,10 +30,12 @@ tools/
   netpeer.py            pretend player and relay for testing network play
   relay.py              pairs players by room code, for games over the internet
   test_relay.py         relay tests
+  cavernduel-relay.service  runs relay.py as a service on a Linux server
   setup_rpcemu.sh       installs RPCEmu Extended and the three machines
   rpcemu.sh             starts a machine on RISC OS 5.27, 5.30 or 3.71
 docs/rpcemu-setup.md    RPCEmu Extended installation guide
 docs/network-play.md    network play: how it works and how to test it
+docs/relay-server.md    setting up the internet relay on a server
 reference/              the original v1.271 release zip
 ```
 

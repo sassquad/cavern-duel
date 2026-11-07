@@ -5,7 +5,7 @@
 </head>
 <body>
     <h2>Cavern Duel</h2>
-    <p>Version 1.30 (3rd November, 2026) </p>
+    <p>Version 1.40 (7th November, 2026) </p>
     <p>By Graeme and Stephen Scott &copy; 1994-2026. <br />
         WIMP front end by <a href="https://drwimp.archivemag.co.uk/" target="_blank">Dr Wimp 5.04</a>.</p>
     <p>This game is dedicated to Mary Scott (1944 - 2010), who always enjoyed playing JCB Digger, Spectapede, Strike
@@ -430,10 +430,21 @@
                 <li>Only Select on the icon bar icon starts the game. Adjust now opens the menu, as Menu does.</li>
             </ul>
         </li>
+        <li><em>V1.40 (7th November, 2026)</em>
+            <ul>
+                <li>Play over the internet, as well as on a home network. After clicking Host, press I for the
+                    internet, and pass on the four-letter room code that appears. The other player types it after
+                    clicking Join. See <a href="#network_play">Playing over a network</a>.</li>
+                <li>Join also accepts a machine's name, as well as its numeric address.</li>
+                <li>Network games stay at full speed on slower connections.</li>
+                <li>The settings and cave the host sends are checked before they're used.</li>
+                <li>A network game needs version 1.40 on both machines.</li>
+            </ul>
+        </li>
     </ul>
     <h3><a name="contacting_us" id="contacting_us"></a>Contacting us </h3>
     <p>Visit the dedicated Cavern Duel page at <a href="https://www.sassquad.net/cavernduel">www.sassquad.net/cavernduel</a> for the latest news on the
         game. <a href="#toc"><em>Back to top</em></a></p>
-    <p><em>&copy; Stephen Scott 2007,2026. Document last updated 3rd November, 2026.</em></p>
+    <p><em>&copy; Stephen Scott 2007,2026. Document last updated 7th November, 2026.</em></p>
 </body>
 </html>

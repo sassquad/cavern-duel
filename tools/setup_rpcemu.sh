@@ -119,12 +119,13 @@ make_machine() {  # name description bundle-zip
     mv "$top/hostfs" "$top/cmos.ram" "$work/machine/"
 
     # RISC OS 5 asks for its address by DHCP. RISC OS 3.71 can't, and the
-    # bundle gives it one on the old emulator's network: move it to this one.
-    # It has no default route, but the host is on the same network as it.
+    # bundle gives it one on the old emulator's network: move it to this one,
+    # with the emulator as its route to the internet.
     local inet="$work/machine/hostfs/!Boot/Choices/Internet"
     if grep -q '10\.10\.10\.10' "$inet/Startup,feb"; then
         sed -i '' -e 's/10\.10\.10\.10/100.64.0.10/g' \
                   -e 's/10\.10\.10\.3/100.64.0.2/g' \
+                  -e 's/10\.10\.10\.2/100.64.0.1/g' \
                   -e 's/255\.255\.255\.0/255.192.0.0/g' "$inet/Startup,feb"
     fi
 
