@@ -46,7 +46,7 @@ README = os.path.join(ROOT, "docs", "release-readme.txt")
 
 
 def targets(rel):
-    return [os.path.join(APP, t + ",ffb") for t in SHARED.get(rel, [rel])]
+    return [os.path.normpath(os.path.join(APP, t + ",ffb")) for t in SHARED.get(rel, [rel])]
 
 
 def sources():
@@ -54,7 +54,8 @@ def sources():
         for name in sorted(files):
             if name.endswith(".bas"):
                 path = os.path.join(dirpath, name)
-                rel = os.path.relpath(path, SRC)[:-len(".bas")]
+                # With / on every system, to match SHARED and PROGRAMS
+                rel = os.path.relpath(path, SRC)[:-len(".bas")].replace(os.sep, "/")
                 yield path, targets(rel)
 
 
@@ -102,8 +103,8 @@ def pull():
             if not name.endswith(",ffb"):
                 continue
             path = os.path.join(dirpath, name)
-            rel = os.path.relpath(path, APP)[:-len(",ffb")]
-            out = os.path.join(SRC, shared_from.get(rel, rel) + ".bas")
+            rel = os.path.relpath(path, APP)[:-len(",ffb")].replace(os.sep, "/")
+            out = os.path.normpath(os.path.join(SRC, shared_from.get(rel, rel) + ".bas"))
             data = read_bytes(path)
             if out in pulled:
                 # A shared library edited in one app but not the other

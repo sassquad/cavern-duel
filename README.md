@@ -1,8 +1,8 @@
 # Cavern Duel
 
 A two-player maze game for RISC OS, by Graeme and Stephen Scott (1994–2026).
-This repository is set up for development in VS Code on a Mac, testing under
-RPCEmu and on real RISC OS 5 hardware.
+This repository is set up for development in VS Code on a Mac or a Windows 11
+PC, testing under RPCEmu and on real RISC OS 5 hardware.
 
 More about the game, including the latest release to download, is at
 <https://www.sassquad.net/cavernduel>.
@@ -31,8 +31,8 @@ tools/
   relay.py              pairs players by room code, for games over the internet
   test_relay.py         relay tests
   cavernduel-relay.service  runs relay.py as a service on a Linux server
-  setup_rpcemu.sh       installs RPCEmu Extended and the three machines
-  rpcemu.sh             starts a machine on RISC OS 5.27, 5.30 or 3.71
+  setup_rpcemu.py       installs RPCEmu Extended and the three machines
+  rpcemu.py             starts a machine on RISC OS 5.27, 5.30 or 3.71
 docs/rpcemu-setup.md    RPCEmu Extended installation guide
 docs/network-play.md    network play: how it works and how to test it
 docs/relay-server.md    setting up the internet relay on a server
@@ -49,28 +49,38 @@ The application folder really is called `!CavenDuel` (no "r"); `!Run` and
 
 ## One-time setup
 
-1. Install Python 3 (the Xcode command line tools' `python3` is fine) and
-   VS Code. Optionally add a BBC BASIC syntax extension from the Marketplace.
+1. Install Python 3, Git and VS Code. On a Mac, the Xcode command line tools'
+   `python3` is fine. On Windows, install Python from python.org (or
+   `winget install Python.Python.3.13`), which gives the `py` command the VS
+   Code tasks use there. Optionally add a BBC BASIC syntax extension from the
+   Marketplace.
 2. Install [RPCEmu Extended](https://github.com/andrewtimmins/rpcemu-extended)
-   with a RISC OS 5 and a RISC OS 3.71 machine, each of which sees `app/` as
-   its **Shared** disc:
+   with RISC OS 5.27, 5.30 and 3.71 machines, each of which sees `app/` as
+   its **Shared** disc. On a Mac:
 
    ```bash
-   tools/setup_rpcemu.sh
+   python3 tools/setup_rpcemu.py
+   ```
+
+   On Windows, in the project folder:
+
+   ```
+   py -3 tools\setup_rpcemu.py
    ```
 
    [docs/rpcemu-setup.md](docs/rpcemu-setup.md) explains each step and
    troubleshooting.
-3. Run the **Build** task once (⇧⌘B) to create the `,ffb` files.
+3. Run the **Build** task once (⇧⌘B on a Mac, Ctrl+Shift+B on Windows) to
+   create the `,ffb` files.
 
 ## Everyday workflow
 
 1. Edit `src/**/*.bas` in VS Code.
-2. ⇧⌘B (**Build**). Errors such as an over-long line appear in the
+2. Run the **Build** task. Errors such as an over-long line appear in the
    Problems panel.
 3. Run the **Run on RISC OS 5** (or **5.30** or **3.71**) task, or start RPCEmu with
-   `tools/rpcemu.sh direct`. Open the **Shared** disc from the icon bar
-   and double-click `!CavenDuel`.
+   `python3 tools/rpcemu.py direct` (`py -3` on Windows). Open the **Shared**
+   disc from the icon bar and double-click `!CavenDuel`.
 
 If you edit BASIC inside RISC OS (with StrongED, Zap or `EDIT`), run
 **Pull BASIC from app** to bring the changes back into `src/` before
@@ -104,7 +114,7 @@ it, which makes inserting lines easy; `RENUMBER` inside RISC OS and a
 
 A Raspberry Pi 4 (or 3B+/400) running RISC OS 5 is the best check, as
 screen modes and speed differ from the emulator. Copy `app/` across on a USB
-stick, or mount a Mac file share on the Pi with LanMan98.
+stick, or mount a Mac or Windows file share on the Pi with LanMan98.
 
 ## Porting notes
 

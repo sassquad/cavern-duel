@@ -129,6 +129,10 @@ one on 5.30, and another played 3.71, with both screens staying identical. Both
 emulators were on the same Mac, connecting out to the VPS, about 20 ms there and
 back.
 
+A game hosted by RISC OS 5.30 in RPCEmu on Windows 11 (ARM, in Parallels), and
+joined from RISC OS 5.27 on the Mac, also stayed in step: the two screens were
+pixel-for-pixel identical. Tab on Windows ended the game on both.
+
 The relay pairs players by a four-letter room code, then passes everything between
 them without looking at it. It keeps nothing on disc and logs no addresses. So that
 it's safe to leave running, it has these limits, set at the top of the file:
