@@ -1,3 +1,5 @@
+# Text files keep LF endings on every system, so builds match on Mac and Windows
+* text=auto eol=lf
 *.bas text eol=lf
 *.py text eol=lf
 *.md text eol=lf

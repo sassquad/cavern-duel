@@ -6,6 +6,7 @@
       "detail": "Tokenise src/*.bas into the HostFS app folder",
       "type": "shell",
       "command": "python3 tools/build.py build",
+      "windows": { "command": "py -3 tools/build.py build" },
       "group": { "kind": "build", "isDefault": true },
       "problemMatcher": {
         "owner": "bbcbasic",
@@ -24,6 +25,7 @@
       "detail": "Build, then copy app/ to the HostFS folder in deploy.local.json",
       "type": "shell",
       "command": "python3 tools/build.py deploy",
+      "windows": { "command": "py -3 tools/build.py deploy" },
       "problemMatcher": []
     },
     {
@@ -31,13 +33,15 @@
       "detail": "Build, then make dist/CavernDuel.zip to unpack on RISC OS",
       "type": "shell",
       "command": "python3 tools/build.py release",
+      "windows": { "command": "py -3 tools/build.py release" },
       "problemMatcher": []
     },
     {
       "label": "Run on RISC OS 5",
       "detail": "Build, then start RPCEmu with the RISC OS Direct machine",
       "type": "shell",
-      "command": "tools/rpcemu.sh direct",
+      "command": "python3 tools/rpcemu.py direct",
+      "windows": { "command": "py -3 tools/rpcemu.py direct" },
       "dependsOn": "Build",
       "problemMatcher": []
     },
@@ -45,7 +49,8 @@
       "label": "Run on RISC OS 5.30",
       "detail": "Build, then start RPCEmu with the RISC OS 5.30 machine",
       "type": "shell",
-      "command": "tools/rpcemu.sh 530",
+      "command": "python3 tools/rpcemu.py 530",
+      "windows": { "command": "py -3 tools/rpcemu.py 530" },
       "dependsOn": "Build",
       "problemMatcher": []
     },
@@ -53,7 +58,8 @@
       "label": "Run on RISC OS 3.71",
       "detail": "Build, then start RPCEmu with the RISC OS 3.71 machine",
       "type": "shell",
-      "command": "tools/rpcemu.sh 371",
+      "command": "python3 tools/rpcemu.py 371",
+      "windows": { "command": "py -3 tools/rpcemu.py 371" },
       "dependsOn": "Build",
       "problemMatcher": []
     },
@@ -62,6 +68,7 @@
       "detail": "Detokenise ,ffb files edited inside RISC OS back into src/",
       "type": "shell",
       "command": "python3 tools/build.py pull",
+      "windows": { "command": "py -3 tools/build.py pull" },
       "problemMatcher": []
     },
     {
@@ -69,6 +76,7 @@
       "detail": "Confirm every source round-trips, then lint each program",
       "type": "shell",
       "command": "python3 tools/build.py check",
+      "windows": { "command": "py -3 tools/build.py check" },
       "problemMatcher": []
     },
     {
@@ -76,12 +84,14 @@
       "detail": "Run the tests for the internet relay, tools/relay.py",
       "type": "shell",
       "command": "python3 tools/test_relay.py",
+      "windows": { "command": "py -3 tools/test_relay.py" },
       "problemMatcher": []
     },
     {
       "label": "Test tokeniser",
       "type": "shell",
       "command": "python3 tools/test_bbcbasic.py",
+      "windows": { "command": "py -3 tools/test_bbcbasic.py" },
       "group": { "kind": "test", "isDefault": true },
       "problemMatcher": []
     }
