@@ -91,6 +91,10 @@ What it does, in order:
    address `100.64.0.10` and the emulator as its route to the internet. The
    script also adds a boot task to 3.71 so that MODE 12 stays 640×256 (see
    [Troubleshooting](#troubleshooting)).
+5. It forwards port 30123 on your computer to each machine, so another computer
+   can join a game hosted in the emulator (see
+   [network-play.md](network-play.md#in-rpcemu)). Other forwarding rules are
+   kept. Existing machines get it too, unless one is running.
 
 Options:
 
@@ -177,6 +181,8 @@ On Windows the program is `rpcemu-recompiler.exe`, with the same options.
 | Mac: "RPCEmu Extended can't be opened" or "is damaged" | Run `xattr -dr com.apple.quarantine ~/Applications/RPCEmu-Extended.app` |
 | Windows: `python3` opens the Microsoft Store | Use `py -3` instead, as the VS Code tasks do, after installing Python from python.org |
 | Windows: a firewall prompt when testing network play | Allow Python on private networks. `tools/netpeer.py` and `tools/relay.py` wait for connections, which Windows asks about |
+| Home-network game: the other player can't connect to a host in RPCEmu | They must type the host computer's address, not the one RISC OS shows. Check the machine has port 30123 forwarded (run the setup script with every machine closed), that the computer's firewall allows RPCEmu, and that only one machine on that computer is running |
+| "Failed to add NAT Network port forwarding rule … Address already in use" | Another machine, or another program, already has port 30123 on this computer. The machine still works, but can't host a home-network game |
 | A machine refuses to start and says it's already running | A machine can only run once at a time. Close its other window |
 | Black window, nothing boots | `roms/<name>/` has no ROM file in it. `machines/<name>/rpclog.txt` says what went wrong |
 | No **Shared** disc contents | Check `RPCEmu-Extended/shared` still links to the project: run the setup script again |

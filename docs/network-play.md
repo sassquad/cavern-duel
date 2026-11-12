@@ -20,6 +20,32 @@ network or over the internet. Steps 1 to 4 of the plan are done.
 2. The other player clicks **Join**, types that address or room code and presses
    Return.
 
+### In RPCEmu
+
+RPCEmu puts RISC OS on a private network inside the computer, which nothing
+outside can reach on its own. So for a home-network game hosted in RPCEmu:
+
+- **The host's machine needs port 30123 forwarded** to it.
+  `tools/setup_rpcemu.py` does this for every machine. Elsewhere, add it in the
+  emulator's **Settings › NAT Port Forwarding Rules**: TCP, port 30123 to port
+  30123.
+- **The other player types the host computer's address**, such as
+  `192.168.1.20`, not the one RISC OS has. A host in RPCEmu says so instead of
+  showing its own. On a Mac it's in **System Settings › Network**; on Windows,
+  `ipconfig` shows it as the IPv4 Address.
+- **The host computer's firewall must let RPCEmu accept connections.** macOS and
+  Windows ask the first time; answer **Allow**. On a Mac, check **System
+  Settings › Network › Firewall › Options**: RPCEmu should be set to allow
+  incoming connections.
+- **A virtual machine needs bridged networking** to be reached from other
+  computers. Parallels' default, shared networking, lets only the Mac reach it.
+
+Only one machine on a computer can have the port: a second one started at the
+same time says the forward failed, and can't host on the home network, though
+it can still join or use the internet.
+
+Over the internet none of this matters, because both players connect out.
+
 The game starts on both machines with the host's settings and cave, after a
 message saying which player you are: the host plays Player 1, the other player
 Player 2. Tab cancels
@@ -56,7 +82,8 @@ too). The sound keys only affect your own machine. Tab or a mouse click
 ## Testing with RPCEmu Extended
 
 Inside RPCEmu Extended the Mac is at **100.64.0.1**. RISC OS can connect out to
-the Mac without any setup.
+the Mac without any setup. The test tools below listen on port 30200, because
+each machine's forward already uses 30123 on the Mac.
 
 ### One machine against a pretend player
 
@@ -67,7 +94,7 @@ the Mac without any setup.
    ```
 
 2. Start RISC OS 5 (**Run on RISC OS 5**) and run Cavern Duel.
-3. Click **Join** and type `100.64.0.1`. You're player 2. Player 1 wanders
+3. Click **Join** and type `100.64.0.1:30200`. You're player 2. Player 1 wanders
    about and fires now and then. The terminal shows what your machine sends
    every 20 frames, and whenever you press Tab or skip.
 
@@ -80,25 +107,24 @@ between them:
 python3 tools/netpeer.py relay
 ```
 
-On one machine, press F12 and type `*Set CavernDuel$Relay 100.64.0.1`, then run
-the game and click **Host**: it connects out to the relay instead of waiting for
-a connection. On the other, click **Join** and type `100.64.0.1`. They can connect
+On one machine, press F12 and type `*Set CavernDuel$Relay 100.64.0.1:30200`, then
+run the game and click **Host**: it connects out to the relay instead of waiting
+for a connection. On the other, click **Join** and type `100.64.0.1:30200`. They can connect
 in either order, and the first waits for the second. The same relay,
 run on a machine with a public address, would let two players behind home routers
 play over the internet.
 
 ### Hosting inside the emulator
 
-An emulated machine can't accept connections unless its port is forwarded. In
-the host's emulator, use **Settings > NAT Port Forwarding Rules** to send a Mac
-port, such as 30124, to port 30123. Another machine on the same Mac then joins
-`100.64.0.1:30124`.
+With port 30123 forwarded, another machine on the same Mac joins `100.64.0.1`,
+and one on another computer joins the Mac's own address. Connecting one emulated
+machine straight to another's address, without a forward, was refused when
+tried.
 
-The address the host shows is its address inside the emulator, so it isn't the
-one to give the other player: use the Mac's address, or `100.64.0.1` on the same
-Mac. Connecting one emulated machine straight to another's address, without a
-relay or a forward, was refused when tried. RPCEmu Extended's own notes say a
-guest operating system using that link hasn't been demonstrated.
+RISC OS 5.27 hosting on the Mac with the forward was joined by RISC OS 5.30 in
+Windows 11 under Parallels, which typed the Mac's address. The other way round,
+the Mac joined the Windows machine's address. Both games stayed in step. Windows
+also reached the Mac's forward at its Wi-Fi address.
 
 A game between RISC OS 5 and RISC OS 3.71 through the relay stayed in step for
 about 1,150 frames with both players moving and firing.
@@ -165,9 +191,10 @@ Then join with that code:
 python3 tools/netpeer.py join 127.0.0.1 --room ABCD
 ```
 
-To try it with the game in RPCEmu, start the relay on the Mac, and on each
-machine press F12 and type `*Set CavernDuel$Server 100.64.0.1` before running the
-game. Host with I on one, and join with the room code on the other. A game between
+To try it with the game in RPCEmu, start the relay on the Mac on another port
+(`python3 tools/relay.py --port 30201`, since each machine's forward uses 30123),
+and on each machine press F12 and type `*Set CavernDuel$Server 100.64.0.1:30201`
+before running the game. Host with I on one, and join with the room code on the other. A game between
 RISC OS 5.27 and 3.71 this way stayed in step, and a wrong code, a cancelled room
 and a server that isn't a relay each gave a clear message.
 

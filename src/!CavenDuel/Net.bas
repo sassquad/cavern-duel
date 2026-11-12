@@ -72,8 +72,8 @@
 72 :
 73 DEF PROCnet_accept:REM Host: wait for the other player to connect
 74 LOCAL s%,e%,f%,ip$
-75 ip$=FNnet_myip:IF ip$<>"" THEN ip$="Your address is "+ip$+" - "
-76 PROCuser_netstatus(ip$+"Waiting for player 2 - Tab cancels")
+75 ip$=FNnet_myip
+76 PROCuser_netstatus(FNnet_waiting(ip$))
 77 net_listen%=FNnet_socket:IF net_listen%<0 THEN ENDPROC
 78 !net_io%=1:SYS "XSocket_Setsockopt",net_listen%,&FFFF,4,net_io%,4:REM SO_REUSEADDR, so the port can be used again straight after a game
 79 PROCnet_address(net_port%)
@@ -291,3 +291,10 @@
 296 IF h%!8<>2 OR h%!12<>4 THEN net_why$="Can't find "+name$:=FALSE
 297 h%=!(h%!16):FOR i%=0 TO 3:net_addr%?(4+i%)=h%?i%:NEXT:REM The first of its addresses
 298 =TRUE
+299 :
+300 DEF FNnet_waiting(ip$):REM What a host shows while it waits. In RPCEmu, RISC OS has an address on the emulator's own network (100.64.0.0/10), which the other player can't use
+301 LOCAL a%,b%,d%
+302 d%=INSTR(ip$+".","."):a%=VAL(LEFT$(ip$,d%-1)):b%=VAL(MID$(ip$,d%+1)):REM The first two numbers. VAL of the whole address would give 100.113, not 100
+303 IF a%=100 AND b%>=64 AND b%<128 THEN ="Waiting for player 2 - give them your computer's address - Tab cancels"
+304 IF ip$="" THEN ="Waiting for player 2 - Tab cancels"
+305 ="Your address is "+ip$+" - Waiting for player 2 - Tab cancels"

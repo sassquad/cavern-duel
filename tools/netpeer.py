@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 """Test Cavern Duel's network play from the Mac.
 
-    netpeer.py relay [--port 30123] [--lag MS] [--jitter MS] [--spike MS]
+    netpeer.py relay [--port 30200] [--lag MS] [--jitter MS] [--spike MS]
         Wait for two copies of the game to connect, then pass everything
         between them. For machines that can't accept connections, such as
-        two RPCEmu machines: on one, set CavernDuel$Relay to 100.64.0.1 and
-        click Host; on the other, click Join and type 100.64.0.1.
+        two RPCEmu machines: on one, set CavernDuel$Relay to 100.64.0.1:30200
+        and click Host; on the other, click Join and type 100.64.0.1:30200.
         To imitate the internet, each direction can be held up by --lag, up to
         --jitter more at random, and --spike more on 5% of its traffic.
 
-    netpeer.py host [address[:port]] [--port 30123] [--frames N] [--cave FILE] [--settings F,W,T,S] [--room]
+    netpeer.py host [address[:port]] [--port 30200] [--frames N] [--cave FILE] [--settings F,W,T,S] [--room]
     netpeer.py join address[:port] [--frames N] [--room CODE]
         Play against one copy of the game with a pretend opponent that
         wanders about and fires now and then, printing what the game sends.
         "host" with no address waits for the game to connect (click Join and
-        type 100.64.0.1 in RPCEmu); with an address it connects out, to a relay
+        type 100.64.0.1:30200 in RPCEmu); with an address it connects out, to a relay
         or to a game behind a port forward. It sends the Default cave and the
         menu's starting settings unless given others, which can be used to
         try sending the game bad ones. With --room, the address is a relay.py,
@@ -32,7 +32,9 @@ import struct
 import sys
 import time
 
-PORT = 30123
+PORT = 30123  # the game's, when connecting to a game or relay
+# Listening on the Mac, keep clear of 30123: each emulated machine forwards it
+LISTEN_PORT = 30200
 VERSION = 3
 REPORT = 5  # seconds between the relay's reports of the game's speed
 CAVE = os.path.join(os.path.dirname(__file__), "..", "app", "!CavenDuel", "Screens", "Default,022")
@@ -238,7 +240,7 @@ def main(argv):
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("role", choices=["relay", "host", "join"])
     parser.add_argument("address", nargs="?")
-    parser.add_argument("--port", type=int, default=PORT)
+    parser.add_argument("--port", type=int, default=LISTEN_PORT)
     parser.add_argument("--frames", type=int)
     parser.add_argument("--lag", type=int, default=0)
     parser.add_argument("--jitter", type=int, default=0)
