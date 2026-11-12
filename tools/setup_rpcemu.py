@@ -41,6 +41,8 @@ DIRECT_ID = "1uIAUIB8wuixm2-49bXQSvnLjdeN8ePaz"
 RO371_ID = "1HWd67HYNRsIh9wgQZZT06GsANlYd4V4i"
 # RISC OS 5.30 stable, from https://www.riscosopen.org/content/downloads
 ROOL_ZIPS = "https://www.riscosopen.org/zipfiles/platform"
+# Cavern Duel's network port, forwarded into every machine
+GAME_PORT = 30123
 
 
 def default_root():
@@ -87,11 +89,30 @@ class Emulator:
                              stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
                              stderr=subprocess.DEVNULL, close_fds=True)
 
-    def running(self):
+    def command_lines(self):
+        """The command lines of the emulator's running processes."""
         if MAC:
-            return subprocess.run(["pgrep", "-qf", os.path.join(self.bin, "rpcemu")]).returncode == 0
-        out = subprocess.run(["tasklist", "/fo", "csv", "/nh"], capture_output=True, text=True).stdout
-        return any(line.lower().startswith('"rpcemu-') for line in out.splitlines())
+            out = subprocess.run(["pgrep", "-lf", os.path.join(self.bin, "rpcemu")],
+                                 capture_output=True, text=True).stdout
+        else:
+            out = subprocess.run(["powershell", "-NoProfile", "-Command",
+                                  "Get-CimInstance Win32_Process -Filter \"Name like 'rpcemu-%'\" "
+                                  "| ForEach-Object { $_.CommandLine }"],
+                                 capture_output=True, text=True).stdout
+        return [line for line in out.splitlines() if line.strip()]
+
+    def running(self, root=None):
+        """Is the emulator running: any machine, or with root, one using that data folder?"""
+        lines = self.command_lines()
+        if root is None:
+            return bool(lines)
+        root = os.path.normcase(os.path.abspath(root))
+        for line in lines:
+            datadir = re.search(r'--datadir\s+(?:"([^"]+)"|(\S+))', line)
+            used = datadir.group(1) or datadir.group(2) if datadir else default_root()
+            if os.path.normcase(os.path.abspath(used)) == root:
+                return True
+        return False
 
 
 def fetch(url, path, valid):
@@ -192,6 +213,33 @@ def write_config(root, name, description, source, three_button):
              "network_type=nat", f"mouse_twobutton={0 if three_button else 1}", "sound_enabled=1"]
     with open(os.path.join(root, "configs", name + ".cfg"), "w", encoding="latin-1", newline="\n") as f:
         f.write("\n".join(lines) + "\n")
+
+
+def add_game_forward(path):
+    """Forward GAME_PORT on this computer to the same port in RISC OS, so that
+    another computer can join a game hosted in the emulator. Inside it, RISC OS
+    is on a private network that nothing outside can reach on its own. Other
+    rules are kept. Returns False if the machine has the rule already."""
+    with open(path, encoding="latin-1", newline="") as f:
+        text = f.read().replace("\r\n", "\n")
+    section = r"^\[nat_port_forward_rules{}\]\n((?:(?!\[).*\n?)*)"
+    for body in re.findall(section.format(r"/\d+"), text, re.M):
+        if re.search(r"^type=TCP$", body, re.M) and re.search(rf"^emu_port={GAME_PORT}$", body, re.M):
+            return False
+    rule = f"type=TCP\nemu_port={GAME_PORT}\nhost_port={GAME_PORT}\n"
+    rules = re.search(section.format(""), text, re.M)
+    if rules:
+        size = re.search(r"^size=(\d+)$", rules.group(1), re.M)
+        count = int(size.group(1)) if size else 0
+        body = re.sub(r"^size=\d+\n?", "", rules.group(1), flags=re.M)
+        text = text[:rules.start(1)] + f"size={count + 1}\n" + body + text[rules.end(1):]
+    else:
+        count = 0
+        text = text.rstrip("\n") + "\n[nat_port_forward_rules]\nsize=1\n"
+    text = text.rstrip("\n") + f"\n[nat_port_forward_rules/{count}]\n" + rule
+    with open(path, "w", encoding="latin-1", newline="\n") as f:
+        f.write(text)
+    return True
 
 
 def edit_text(path, changes):
@@ -318,6 +366,14 @@ def main(argv):
     make_machine(root, "direct", "RISC OS 5", os.path.join(downloads, "EasyStart-Direct.zip"), args.three_button)
     make_machine(root, "ro371", "RISC OS 3.71", os.path.join(downloads, "EasyStart-371.zip"), args.three_button)
     make_ro530(root, emu, downloads, args.three_button)
+
+    if emu.running(root):
+        print(f"\nA machine is running, so port {GAME_PORT} wasn't forwarded: it would save its "
+              "settings over the change. Close every machine and run this again.")
+    else:
+        for name in ("direct", "ro530", "ro371"):
+            if add_game_forward(os.path.join(root, "configs", name + ".cfg")):
+                print(f"Forwarded port {GAME_PORT} to {name}, for network games it hosts")
 
     print("\nDone. Start a machine with the Run on RISC OS tasks in VS Code, or:")
     print("  python3 tools/rpcemu.py direct|530|371" if not WINDOWS else "  py -3 tools\\rpcemu.py direct|530|371")

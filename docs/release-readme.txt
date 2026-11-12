@@ -41,3 +41,16 @@ the game connects on TCP port 30123, so a firewall on the host needs to
 allow it. Over the internet, both machines connect out to the Cavern
 Duel relay, so there's nothing to set up on your router. A room closes
 if nobody joins it within 15 minutes.
+
+
+Playing in an emulator
+----------------------
+
+Over the internet, the game works in RPCEmu as it is. To host a game on
+your home network in RPCEmu:
+
+- In the emulator's Settings, under NAT Port Forwarding Rules, forward
+  TCP port 30123 to port 30123.
+- The other player types your computer's network address, not the one
+  RISC OS has (the game says so instead of showing it).
+- Allow RPCEmu through your computer's firewall when it asks.

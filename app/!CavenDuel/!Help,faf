@@ -177,6 +177,9 @@
     </ol>
     <p>Over the internet, both machines connect out to the Cavern Duel relay, so there's nothing to set up on your
         router. A room closes if nobody joins it within 15 minutes.</p>
+    <p>To host a home network game in RPCEmu, forward TCP port 30123 to port 30123 in the emulator's NAT Port
+        Forwarding Rules, and allow RPCEmu through your computer's firewall. The other player types your computer's
+        network address, not the one RISC OS has; the game says so instead of showing it.</p>
     <p>The game starts on both machines with the host's settings and cave. The host plays Player 1 and the other player
         plays Player 2, on either set of keys; a message before the game says which you are. Tab cancels while
         connecting and ends the game for both players. Pause is switched off in a network game. <a href="#toc"><em>Back to top</em></a></p>
