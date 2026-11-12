@@ -5,7 +5,7 @@
 </head>
 <body>
     <h2>Cavern Duel</h2>
-    <p>Version 1.40 (7th November, 2026) </p>
+    <p>Version 1.41 (12th November, 2026) </p>
     <p>By Graeme and Stephen Scott &copy; 1994-2026. <br />
         WIMP front end by <a href="https://drwimp.archivemag.co.uk/" target="_blank">Dr Wimp 5.04</a>.</p>
     <p>This game is dedicated to Mary Scott (1944 - 2010), who always enjoyed playing JCB Digger, Spectapede, Strike
@@ -444,10 +444,18 @@
                 <li>A network game needs version 1.40 on both machines.</li>
             </ul>
         </li>
+        <li><em>V1.41 (12th November, 2026)</em>
+            <ul>
+                <li>When hosting a home network game in RPCEmu, the game now asks the other player to type your
+                    computer's address, rather than showing the emulator's own address, which they can't use. See
+                    <a href="#network_play">Playing over a network</a> for the emulator settings this needs.</li>
+                <li>Version 1.41 can play network games with version 1.40.</li>
+            </ul>
+        </li>
     </ul>
     <h3><a name="contacting_us" id="contacting_us"></a>Contacting us </h3>
     <p>Visit the dedicated Cavern Duel page at <a href="https://www.sassquad.net/cavernduel">www.sassquad.net/cavernduel</a> for the latest news on the
         game. <a href="#toc"><em>Back to top</em></a></p>
-    <p><em>&copy; Stephen Scott 2007,2026. Document last updated 7th November, 2026.</em></p>
+    <p><em>&copy; Stephen Scott 2007,2026. Document last updated 12th November, 2026.</em></p>
 </body>
 </html>

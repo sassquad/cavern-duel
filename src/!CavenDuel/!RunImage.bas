@@ -1,13 +1,13 @@
 1 REM Cavern Duel - !RunImage
 2 REM Prepared by Stephen Scott using DrWimp 4.70, upgraded to DrWimp 5.04
 3 REM Thanks to Andy Southgate for WIMP code of previous versions
-4 REM V1.40 (7-Nov-2026)
+4 REM V1.41 (12-Nov-2026)
 5 REM (c) 1994-2026
 6
 7 LIBRARY "<CavenDuel$Dir>.DrWimp"
 8
 9 appname$="CavenDuel"
-10 ver$="1.40 (7-Nov-2026)"
+10 ver$="1.41 (12-Nov-2026)"
 11
 12 ON ERROR PROCwimp_error(appname$,REPORT$+" at line "+STR$(ERL),1,"",0,1,""):PROCuser_error:PROCwimp_closedown:END
 13 task%=FNwimp_initialise(appname$,7000,360,0)
