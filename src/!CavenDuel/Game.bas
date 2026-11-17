@@ -4,15 +4,13 @@
 4 REM Copyright held by authors. Distribute freely, but do not alter any internal files!
 5 REM Written by Graeme and Stephen Scott © 1994-2026
 6 REM See documentation for contact details
-7 version$="Version 1.41 (12th November 2026)"
-8 ON ERROR MODE12:SYS "Hourglass_Off":REPORT:PRINT" at line ";ERL:IF GET:PROCtidy:END
+7 version$="Version 1.41 (12th November 2026)":LIBRARY "<CavenDuel$Dir>.Screen":PROCscr_init
+8 ON ERROR ON ERROR OFF:PROCscr_error:SYS "Hourglass_Off":REPORT:PRINT" at line ";ERL:IF GET:PROCtidy:END
 9 LIBRARY "<CavenDuel$Dir>.Net":PROCnet_init:SYS "OS_Byte",229,1: REM Load network play, disable Escape
 10 PROCarrays
 11 PROCinitgrab
-12 PROCinitfader
 13 :
-14 MODE 128+12
-15 MODE 12
+14 PROCscr_open
 16 OFF
 17 PROCcolours(1)
 18 PROCintro
@@ -59,124 +57,63 @@
 59 grab%!8=16:grabtwo%!8=16
 60 SYS 46,&109,grab%
 61 SYS 46,&109,grabtwo%
-62 s1%=1:s2%=2:s3%=1:s4%=2
-63 width%=16:width2%=16
-64 height%=16:height2%=16
+62 REM Each player's half of the picture is copied into these, to draw over every frame
 65 ENDPROC
 66 :
-67 DEF PROCinitfader
-68 REM 16 Colour mode fader.
-69 REM by Matthew Edgar
-70 REM (c) The Micro User September/November 1990
-71 ptr=1:done=3:sixteen=4:colour=5
-72 DIM code% 256:FOR pass=0 TO 2 STEP 2
-73 P%=code%:[OPT pass
-74 .fade
-75 STMFD R13!,{R0-R5,R14}
-76 MOV done,#16
-77 MOV sixteen,#16
-78 .wait
-79 MOV R0,#19
-80 SWI "OS_Byte" \ wait...
-81 SWI "OS_Byte" \ ...and again
-82 MOV colour,#15
-83 ADR ptr,data
-84 .nextcolour
-85 STRB colour,[ptr]
-86 MOV R0,#11
-87 SWI "OS_Word"    \ read palette
-88 .red
-89 LDRB R0,[ptr,#2] \ current value
-90 SUBS R0,R0,sixteen
-91 MOVMI R0,#0      \ find new value
-92 STRB R0,[ptr,#2] \ store new value
-93 .green
-94 LDRB R0,[ptr,#3] \ current value
-95 SUBS R0,R0,sixteen
-96 MOVMI R0,#0      \ find new value
-97 STRB R0,[ptr,#3] \ store new value
-98 .blue
-99 LDRB R0,[ptr,#4] \ current value
-100 SUBS R0,R0,sixteen
-101 MOVMI R0,#0      \ find new value
-102 STRB R0,[ptr,#4] \ store new value
-103 STRB sixteen,[ptr,#1] \ define colour from RGB values
-104 MOV R0,#12
-105 SWI "OS_Word" \ write palette
-106 SUBS colour,colour,#1
-107 BGE nextcolour
-108 BL border
-109 SUBS done,done,#1
-110 BNE wait
-111 LDMFD R13!,{R0-R5,PC}:.border
-112 STMFD R13!,{R0-R3,R14}:MOV R0,ptr
-113 MOV R1,#24:STRB R1,[R0,#1]
-114 SWI "OS_ReadPalette":MOV R1,#2
-115 .loop:MOV R2,R2,ROR #8
-116 AND R3,R2,#&FF:SUBS R3,R3,sixteen
-117 MOVMI R3,#0:STRB R3,[R0,R1]
-118 ADD R1,R1,#1:CMP R1,#5:BNE loop
-119 MOV ptr,R0:MOV R0,#12
-120 SWI "OS_Word"
-121 LDMFD R13!,{R0-R3,PC}
-122 .data
-123 EQUD 0:EQUD 0
-124 ]:NEXT
-125 ENDPROC
 126 :
 127 DEF PROCcolours(pal%)
 128 CASE pal% OF
 129 WHEN 1: REM Title screen palette
-130 COLOUR 0,255,255,255
-131 COLOUR 1,221,221,221
-132 COLOUR 2,187,187,187
-133 COLOUR 3,153,153,153
-134 COLOUR 4,119,119,119
-135 COLOUR 5,85,85,85
-136 COLOUR 6,51,51,51
-137 COLOUR 7,0,0,0
-138 COLOUR 8,0,68,153
-139 COLOUR 9,238,0,0
-140 COLOUR 10,0,204,0
-141 COLOUR 11,221,0,0
-142 COLOUR 12,238,238,187
-143 COLOUR 13,85,136,0
-144 COLOUR 14,255,187,0
-145 COLOUR 15,0,187,255
+130 PROCscr_colour(0,255,255,255)
+131 PROCscr_colour(1,221,221,221)
+132 PROCscr_colour(2,187,187,187)
+133 PROCscr_colour(3,153,153,153)
+134 PROCscr_colour(4,119,119,119)
+135 PROCscr_colour(5,85,85,85)
+136 PROCscr_colour(6,51,51,51)
+137 PROCscr_colour(7,0,0,0)
+138 PROCscr_colour(8,0,68,153)
+139 PROCscr_colour(9,238,0,0)
+140 PROCscr_colour(10,0,204,0)
+141 PROCscr_colour(11,221,0,0)
+142 PROCscr_colour(12,238,238,187)
+143 PROCscr_colour(13,85,136,0)
+144 PROCscr_colour(14,255,187,0)
+145 PROCscr_colour(15,0,187,255)
 146 WHEN 2: REM Ingame palette
-147 COLOUR 0,255,255,255
-148 COLOUR 1,221,221,221
-149 COLOUR 2,187,187,187
-150 COLOUR 3,136,136,136
-151 COLOUR 4,85,85,85
-152 COLOUR 5,255,255,0
-153 COLOUR 6,221,0,221
-154 COLOUR 7,0,0,0
-155 COLOUR 8,170,119,0
-156 COLOUR 9,204,0,0
-157 COLOUR 10,0,204,0
-158 COLOUR 11,102,0,187
-159 COLOUR 12,136,68,0
-160 COLOUR 13,170,0,0
-161 COLOUR 14,0,170,0
-162 COLOUR 15,0,255,255
+147 PROCscr_colour(0,255,255,255)
+148 PROCscr_colour(1,221,221,221)
+149 PROCscr_colour(2,187,187,187)
+150 PROCscr_colour(3,136,136,136)
+151 PROCscr_colour(4,85,85,85)
+152 PROCscr_colour(5,255,255,0)
+153 PROCscr_colour(6,221,0,221)
+154 PROCscr_colour(7,0,0,0)
+155 PROCscr_colour(8,170,119,0)
+156 PROCscr_colour(9,204,0,0)
+157 PROCscr_colour(10,0,204,0)
+158 PROCscr_colour(11,102,0,187)
+159 PROCscr_colour(12,136,68,0)
+160 PROCscr_colour(13,170,0,0)
+161 PROCscr_colour(14,0,170,0)
+162 PROCscr_colour(15,0,255,255)
 163 WHEN 3: REM Menu palette
-164 COLOUR 0,240,240,240
-165 COLOUR 1,208,208,208
-166 COLOUR 2,176,176,176
-167 COLOUR 3,144,144,144
-168 COLOUR 4,112,112,112
-169 COLOUR 5,80,80,80
-170 COLOUR 6,48,48,48
-171 COLOUR 7,0,0,0
-172 COLOUR 8,0,96,0
-173 COLOUR 9,224,224,0
-174 COLOUR 10,0,192,0
-175 COLOUR 11,208,0,0
-176 COLOUR 12,224,224,176
-177 COLOUR 13,80,128,0
-178 COLOUR 14,240,176,0
-179 COLOUR 15,160,0,0
+164 PROCscr_colour(0,240,240,240)
+165 PROCscr_colour(1,208,208,208)
+166 PROCscr_colour(2,176,176,176)
+167 PROCscr_colour(3,144,144,144)
+168 PROCscr_colour(4,112,112,112)
+169 PROCscr_colour(5,80,80,80)
+170 PROCscr_colour(6,48,48,48)
+171 PROCscr_colour(7,0,0,0)
+172 PROCscr_colour(8,0,96,0)
+173 PROCscr_colour(9,224,224,0)
+174 PROCscr_colour(10,0,192,0)
+175 PROCscr_colour(11,208,0,0)
+176 PROCscr_colour(12,224,224,176)
+177 PROCscr_colour(13,80,128,0)
+178 PROCscr_colour(14,240,176,0)
+179 PROCscr_colour(15,160,0,0)
 180 ENDCASE
 181 ENDPROC
 182 :
@@ -194,17 +131,17 @@
 194 MOUSE OFF
 195 SYS 46,&122,sprites%,"title",0,0,0
 196 COLOUR135:COLOUR11:OFF
-197 PRINT TAB(23,24)"© Graeme & Stephen Scott 1994-2026.":PRINT TAB(24,30);version$
+197 PRINT TAB(23,24)"© Graeme & Stephen Scott 1994-2026.":PRINT TAB(24,30);version$:PROCscr_show
 198 PROCloadsprites("CavenDuel:Graphics.GameSprs")
 199 PROCloadscreens("<Game$Path>")
-200 VOICES 8:CALL fade:PROCclearbanks
+200 VOICES 8:PROCscr_fade:PROCclearbanks
 201 ENDPROC
 202 :
 203 DEF PROCwait(T)
 204 LOCAL x%,y%,b%
 205 M=FALSE
 206 T%=TIME
-207 REPEAT MOUSE x%,y%,b%
+207 REPEAT PROCscr_mouse(x%,y%,b%)
 208 IF b%<>0skip%=TRUE
 209 UNTIL TIME>T%+T ORskip%
 210 ENDPROC
@@ -298,7 +235,7 @@
 298 ENDPROC
 299 :
 300 DEF PROCmenu
-301 FOR I%=1TO15:VDU19,I%,0;0;:NEXT
+301 PROCscr_black
 302 drone%=0
 303 done1=0:done2=0:done3=0:done4=0
 304 !scale%=1:scale%!4=1:scale%!8=1:scale%!12=1
@@ -313,7 +250,7 @@
 313 PROCdrawboxes
 314 SYS&2E,36+256,area%,"ptr_sword",1,0,0
 315 VDU5
-316 MOUSE ON:OFF
+316 MOUSE ON:OFF:PROCscr_show
 317 ENDPROC
 318 :
 319 DEF PROCdrawtitle
@@ -365,7 +302,7 @@
 367 ENDPROC
 368 :
 369 DEF PROCdronening:REM Attaching a voice cuts off the channel's sound, so only attach it just before each groan
-370 drone%=TIME
+370 drone%=TIME:PROCscr_tick
 371 IF done1=0:IF drone%>0:SYS "XOS_CLI","Channel. 2 ARG":SOUND2,-15,&100,100:done1=1
 372 IF done2=0:IF drone%>480:SYS "XOS_CLI","Channel. 2 ARG":SOUND2,-15,&200,100:done2=1
 373 IF done3=0:IF drone%>880:SYS "XOS_CLI","Channel. 2 ARG":SOUND2,-15,&300,100:done3=1
@@ -376,7 +313,7 @@
 378 DEF PROCmouse
 379 IF screen=1 AND INKEY-99:PROCstartgame(0,"",""):ENDPROC
 380 LOCAL MX%,MY%,but%
-381 MOUSE MX%,MY%,but%
+381 PROCscr_mouse(MX%,MY%,but%)
 382 IF but%=0 THEN ENDPROC
 383 IF but%=4 step=1
 384 IF but%=1 step=-1
@@ -393,19 +330,19 @@
 395 IF tran GCOL15:RECTANGLE FILL656,712,200,48:televal+=step:PROCcheckvals:PROCshadow(STR$(televal),656,752,12,8)
 396 IF shld GCOL15:RECTANGLE FILL656,512,200,48:shldval+=step:PROCcheckvals:PROCshadow(STR$(shldval),656,552,12,8)
 397 IF play OR host OR join PROCstartbutton:ENDPROC
-398 IF help CALL fade:PROCinstruct:CALL fade:PROCclearbanks:PROCmenu:ENDPROC
-399 IF new CALL fade:PROCloadnewcaves:CALL fade:PROCclearbanks:PROCmenu:ENDPROC
-400 IF quit CALL fade:PROCquit:ENDPROC
+398 IF help PROCscr_fade:PROCinstruct:PROCscr_fade:PROCclearbanks:PROCmenu:ENDPROC
+399 IF new PROCscr_fade:PROCloadnewcaves:PROCscr_fade:PROCclearbanks:PROCmenu:ENDPROC
+400 IF quit PROCscr_fade:PROCquit:ENDPROC
 401 WHEN 2:
 402 yes=FNrange(250,250,160,64)
 403 no=FNrange(930,250,160,64)
 404 IF yes THEN end=TRUE
-405 IF no THEN CALL fade:PROCclearbanks:PROCmenu:ENDPROC
+405 IF no THEN PROCscr_fade:PROCclearbanks:PROCmenu:ENDPROC
 406 ENDCASE
 407 ENDPROC
 408 :
 409 DEF PROCinstruct
-410 VDU5,24,0;0;1279;940;:GCOL 135:CLG:VDU26:PROCsize(16,8)
+410 LOCAL mx%,my%,mb%:VDU5,24,0;0;1279;940;:GCOL 135:CLG:VDU26:PROCsize(16,8)
 411 PROCshadow("INSTRUCTIONS",28*16,908,12,8):PROCsize(8,8)
 412 PROCshadow("You have knocked over the pint glass of Big Biceps McCrinkle, the strongest",40,850,9,4)
 413 PROCshadow("warrior in the land. Insulted, he demands a duel to the death within the caverns",0,850-32,9,4)
@@ -431,9 +368,9 @@
 433 PROCshadow("Click mouse button to continue...",368,80,12,4)
 434 PROCcolours(3)
 435 REPEAT
-436 MOUSE X,Y,Z
+436 PROCscr_mouse(mx%,my%,mb%)
 437 PROCdronening
-438 UNTIL Z<>0
+438 UNTIL mb%<>0
 439 ENDPROC
 440 :
 441 DEF PROCquit
@@ -449,7 +386,7 @@
 451 ENDPROC
 452
 453 DEF PROCloadnewcaves
-454 VDU 5,24,0;0;1279;940;
+454 LOCAL mx%,my%,mb%:VDU 5,24,0;0;1279;940;
 455 GCOL 135
 456 CLG
 457 PROCdrawknights
@@ -476,17 +413,17 @@
 478 UNTIL mapnum>datafiles%
 479 :
 480 REPEAT
-481 MOUSE X,Y,Z
+481 PROCscr_mouse(mx%,my%,mb%)
 482 PROCdronening
 483 x2=250
 484 y2=280
 485 FOR a=1TOdatafiles%
-486 IF X>x2 AND X<x2+192 AND Y>y2 AND Y<y2+40 AND Z=4:SOUND6,-15,190+(a*5),10:PROCloadnewscreens
+486 IF mx%>x2 AND mx%<x2+192 AND my%>y2 AND my%<y2+40 AND mb%=4:SOUND6,-15,190+(a*5),10:PROCloadnewscreens
 487 x2+=212
 488 IF x2>1025:x2=250:y2-=52
 489 NEXT
 490 UNTIL loaded=1
-491 CALL fade
+491 PROCscr_fade
 492 ENDPROC
 493 :
 494 DEF PROCloadnewscreens
@@ -496,12 +433,12 @@
 498 VDU5
 499 :
 500 REM Clearing teleporters
-501 PROCshadow("Clearing teleports",26*16,400,14,8)
+501 PROCshadow("Clearing teleports",26*16,400,14,8):PROCscr_show
 502 PROCclearteleports
 510 :
 511 GCOL7
 512 RECTANGLE FILL0,360,1280,50
-513 PROCshadow("Loading screens - "+fname$(a),26*16,400,14,8)
+513 PROCshadow("Loading screens - "+fname$(a),26*16,400,14,8):PROCscr_show
 514 PROCloadscreens("CavenDuel:Screens."+fname$(a))
 515 loaded=1
 516 SYS "XOS_CLI","Set Game$Path CavenDuel:Screens."+fname$(a)
@@ -539,10 +476,10 @@
 548 IF MY%>RY AND MY%<(RY+RH):YT=TRUE
 549 IF (XT=FALSE) OR (YT=FALSE): =FALSE
 550 MOVE RX,RY
-551 PLOT &62,RW,RH
+551 PLOT &62,RW,RH:PROCscr_show
 552 T%=TIME:REPEAT UNTIL TIME>T%+7
 553 MOVE RX,RY
-554 PLOT &62,RW,RH
+554 PLOT &62,RW,RH:PROCscr_show
 555 =TRUE
 556 :
 557 DEF PROCsize(x%,y%):VDU 23,17,7,6,x%;y%|
@@ -561,15 +498,15 @@
 570 ENDPROC
 571 :
 572 DEF PROCtidy
-573 CALL fade
+573 PROCscr_fade
 574 SYS "Hourglass_Off":PROCnet_close
 575 MOUSE OFF:VDU26:COLOUR128:CLS
 576 SYS "OS_Byte",15,0
-577 VDU 20
+577 PROCscr_end
 578 ENDPROC
 579 :
 580 DEF PROCplay
-581 CLS:FOR I%=0TO15:VDU19,I%,0;0;:NEXT:PROCclearbanks
+581 CLS:PROCscr_black:PROCclearbanks
 582 MOUSE OFF
 583 gapfire=0:PROCseed(FNnet_seed):REM A network game seeds both machines with the same number
 584 REM Recall pre-positioned objects
@@ -635,10 +572,7 @@
 644 IF energy(1)<=0 OR energy(2)<=0:counttillend%+=1:PROCprintwinner
 645 IF counttillend%=1:SOUND2,-15,&1000,100:PROCfindwinner
 646 frame%+=5:REPEAT UNTIL TIME-frame%>=0:IF TIME-frame%>20 THEN frame%=TIME:REM A frame starts every 5cs, however long this one took. After a short hold-up the game catches up; after a long one it carries on from now
-647 WAIT
-648 SYS 6,112,s1%
-649 SYS 6,113,s2%
-650 SWAP s1%,s2%
+647 PROCscr_frame
 651 UNTIL end%=1 OR counttillend%>90
 652 TIME=0:creds=1:REM The menu's groans go by TIME
 653 :
@@ -1060,8 +994,8 @@
 1069 :
 1070 REM Grab Screen
 1071 DEF PROCgrab(pl%)
-1072 IF pl%=1:SYS46,&110,grabtwo%,gg$,0,0,512,1280,1023:SYS46,&118,grabtwo%,gg$ TO,,bg2%:SYS46,&128,grabtwo%,gg$ TO,,,width2%,height2%
-1073 IF pl%=2:SYS46,&110,grab%,g$,0,0,0,1280,508:SYS46,&118,grab%,g$ TO,,bg%:SYS46,&128,grab%,g$ TO,,,width%,height%
+1072 IF pl%=1:PROCscr_grab(grabtwo%,gg$,512,1023):SYS46,&118,grabtwo%,gg$ TO,,bg2%
+1073 IF pl%=2:PROCscr_grab(grab%,g$,0,508):SYS46,&118,grab%,g$ TO,,bg%
 1074 ENDPROC
 1075 :
 1076 DEF PROCsortwepchange
@@ -1337,25 +1271,11 @@
 1346 ENDPROC
 1347 :
 1348 DEF PROCclearbanks
-1349 SYS6,112,1
-1350 SYS6,113,1
-1351 VDU26:VDU4:COLOUR135:CLS
-1352 SYS6,112,2
-1353 SYS6,113,2
-1354 COLOUR135:CLS
-1355 SYS6,113,1
-1356 SYS6,112,1
+1349 PROCscr_clear(135)
 1357 ENDPROC
 1358 :
 1359 DEF PROCclearbanks2
-1360 SYS6,112,1
-1361 SYS6,113,1
-1362 VDU26:VDU4:COLOUR128:CLS
-1363 SYS6,112,2
-1364 SYS6,113,2
-1365 COLOUR128:CLS
-1366 SYS6,113,1
-1367 SYS6,112,1
+1360 PROCscr_clear(128)
 1368 ENDPROC
 1369 :
 1370 DEF PROCreadkeys:REM Pads: 1 left, 2 right, 4 up, 8 down, 16 fire. ctl%: 1 pause, 2 sound off, 4 sound on, 8 quit, 16 skip winner
@@ -1400,10 +1320,10 @@
 1409 IF FNnet_lost THEN
 1410 IF FNnet_why="Cancelled" THEN PROCclearstatus ELSE PROCuser_netstatus(FNnet_why)
 1411 PROCnet_close
-1412 REPEAT:MOUSE x%,y%,b%:UNTIL b%=0 AND INKEY-99=0
+1412 REPEAT:PROCscr_tick:PROCscr_mouse(x%,y%,b%):UNTIL b%=0 AND INKEY-99=0
 1413 ENDPROC
 1414 ENDIF
-1415 CALL fade:PROCclearbanks2:PROCplay:CALL fade:PROCclearbanks:PROCmenu
+1415 PROCscr_fade:PROCclearbanks2:PROCplay:PROCscr_fade:PROCclearbanks:PROCmenu
 1416 IF FNnet_lost THEN PROCuser_netstatus(FNnet_why)
 1417 PROCnet_close
 1418 ENDPROC
@@ -1419,7 +1339,7 @@
 1428 DEF FNaskaddress:REM Type an address or room code in the strip along the bottom of the menu; "" if cancelled
 1429 LOCAL a$,k%,x%,y%,b%
 1430 a$=FNnet_var("CavernDuel$Address")
-1431 REPEAT:MOUSE x%,y%,b%:UNTIL b%=0
+1431 REPEAT:PROCscr_tick:PROCscr_mouse(x%,y%,b%):UNTIL b%=0
 1432 SYS "OS_Byte",15,0
 1433 REPEAT
 1434 PROCuser_netstatus("Host's address or room code: "+a$+"_  (Tab cancels)")
@@ -1471,11 +1391,11 @@
 1480 ENDPROC
 1481 :
 1482 DEF PROCclearstatus:REM Back to the credits in the strip along the bottom of the menu
-1483 GCOL7:RECTANGLE FILL0,0,1280,112:PROCsize(8,8):PROCdrawcredits:PROCsize(32,8)
+1483 GCOL7:RECTANGLE FILL0,0,1280,112:PROCsize(8,8):PROCdrawcredits:PROCsize(32,8):PROCscr_show
 1484 ENDPROC
 1485 :
 1486 DEF PROCuser_netstatus(text$):REM Network messages go in a strip along the bottom of the menu
-1487 text$=LEFT$(text$,79):GCOL7:RECTANGLE FILL0,0,1280,112:PROCsize(8,8):PROCshadow(text$,640-LEN(text$)*8,72,0,0):PROCsize(32,8):REM Back to the size the menu draws its numbers in
+1487 text$=LEFT$(text$,79):GCOL7:RECTANGLE FILL0,0,1280,112:PROCsize(8,8):PROCshadow(text$,640-LEN(text$)*8,72,0,0):PROCsize(32,8):PROCscr_show:REM Back to the size the menu draws its numbers in
 1488 ENDPROC
 1489 :
 1490 DEF PROCshowside:REM A moment to see which player this machine plays, before the first frame
@@ -1521,7 +1441,7 @@
 1530 :
 1531 DEF FNaskwhere:REM "H" for the home network, "I" for the internet, "" if cancelled
 1532 LOCAL k%,x%,y%,b%
-1533 REPEAT:MOUSE x%,y%,b%:UNTIL b%=0
+1533 REPEAT:PROCscr_tick:PROCscr_mouse(x%,y%,b%):UNTIL b%=0
 1534 SYS "OS_Byte",15,0
 1535 PROCuser_netstatus("Host on your home network (H) or the internet (I)?  (Tab cancels)")
 1536 REPEAT:PROCdronening:k%=INKEY(10) OR 32:UNTIL k%=104 OR k%=105 OR k%=41:REM h, i or Tab, either case

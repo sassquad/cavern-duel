@@ -21,7 +21,7 @@
         <li><a href="#hints_tips">Hints &amp; tips</a></li>
         <li><a href="#loading_new_cavefiles">Loading new Cavefiles </a></li>
         <li><a href="#compatibility">Compatibility</a></li>
-        <li><a href="#riscpc_users">Risc PC Users</a></li>
+        <li><a href="#riscpc_users">Screen modes</a></li>
         <li><a href="#filing_systems">Filing systems</a></li>
         <li><a href="#altering_filetype">Altering the Cavefile filetype</a></li>
         <li><a href="#version_history">Version history </a></li>
@@ -234,9 +234,13 @@
         speed will be an issue on real hardware prior to the Acorn RISC PC.</p>
     <p>As of 2026, game development takes place on an Apple Studio Mac running RPCEmu Extended, which runs RISC OS 3.71, RISC OS 5.27 and RISC OS 5.30 for compatibility testing. The game therefore runs pretty well on these editions of RISC
         OS. <a href="#toc"><em>Back to top</em></a></p>
-    <h3><a name="riscpc_users" id="riscpc_users"></a>Risc PC users </h3>
-    <p>The game runs in 16 colour mode 12, and may be shown
-        letterboxed. Shown below is a monitor definition file for
+    <h3><a name="riscpc_users" id="riscpc_users"></a>Screen modes </h3>
+    <p>The game is shown in whatever screen mode the desktop is in, made as big as fits in the middle of the
+        screen, with black around it. It doesn't change the screen mode or the desktop's colours.</p>
+    <p>To play in mode 12 itself, as earlier versions did, type <tt>*Set CavernDuel$Screen MODE12</tt> at the command
+        line (F12) before starting the game, or add that line to your boot sequence. The game also uses mode 12 on
+        RISC OS before 3.5, and on a machine too slow to show the game in a desktop mode.</p>
+    <p>In mode 12 a Risc PC may show the game letterboxed. Shown below is a monitor definition file for
         mode 12, which you can attach to the appropriate monitor
         file in the <tt>!Boot.Resources.Configure.Monitors</tt> directory.
         It was taken from the !Xtreme megademo from BASS/Armaxess. </p>

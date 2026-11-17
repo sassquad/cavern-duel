@@ -36,7 +36,7 @@ SHARED = {
 # Programs and the libraries they load with LIBRARY, for lint
 PROGRAMS = {
     "!CavenDuel/!RunImage": ["shared/DrWimp"],
-    "!CavenDuel/Game": ["!CavenDuel/Net"],
+    "!CavenDuel/Game": ["!CavenDuel/Net", "!CavenDuel/Screen"],
     "!CavernEd/!RunImage": ["shared/DrWimp"],
 }
 
