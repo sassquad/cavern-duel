@@ -235,8 +235,12 @@
     <p>As of 2026, game development takes place on an Apple Studio Mac running RPCEmu Extended, which runs RISC OS 3.71, RISC OS 5.27 and RISC OS 5.30 for compatibility testing. The game therefore runs pretty well on these editions of RISC
         OS. <a href="#toc"><em>Back to top</em></a></p>
     <h3><a name="riscpc_users" id="riscpc_users"></a>Screen modes </h3>
-    <p>The game is shown in whatever screen mode the desktop is in, made as big as fits in the middle of the
-        screen, with black around it. It doesn't change the screen mode or the desktop's colours.</p>
+    <p>The game is shown in whatever screen mode the desktop is in, in the middle of the screen with black around
+        it. It doesn't change the screen mode or the desktop's colours. To keep it sharp, every pixel of the game is
+        drawn the same size, so it is made as big as fits in whole multiples: on a 1920x1080 screen, for example,
+        each pixel of the game becomes 2 by 4 pixels of the screen.</p>
+    <p>To make the game as big as fits instead, type <tt>*Set CavernDuel$Screen Fill</tt> before starting it. Some
+        pixels are then drawn bigger than others.</p>
     <p>To play in mode 12 itself, as earlier versions did, type <tt>*Set CavernDuel$Screen MODE12</tt> at the command
         line (F12) before starting the game, or add that line to your boot sequence. The game also uses mode 12 on
         RISC OS before 3.5, and on a machine too slow to show the game in a desktop mode.</p>
@@ -458,8 +462,8 @@
         </li>
         <li><em>V1.42 (17th November, 2026)</em>
             <ul>
-                <li>The game is now shown in the desktop's own screen mode, made as big as fits, instead of changing
-                    to mode 12. The desktop's colours are left alone. See <a href="#riscpc_users">Screen modes</a>
+                <li>The game is now shown in the desktop's own screen mode, as big as fits while keeping it sharp,
+                    instead of changing to mode 12. The desktop's colours are left alone. See <a href="#riscpc_users">Screen modes</a>
                     to play in mode 12 as before.</li>
                 <li>Version 1.42 can play network games with versions 1.40 and 1.41.</li>
             </ul>

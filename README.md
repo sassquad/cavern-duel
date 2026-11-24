@@ -123,7 +123,10 @@ The code is 32-bit safe and has no ARM assembler, and the sound modules in
 
 - **Screen mode.** The game is drawn as MODE 12 (16 colours, 640×256), but
   doesn't change to it. `Screen` draws it into a MODE 12 sprite and shows that
-  scaled to fit, in the middle of the desktop's own mode, with the game's
+  in the middle of the desktop's own mode, at the largest whole multiple of its
+  pixels that fits (RISC OS scales sprites by repeating pixels, so any other
+  size draws some pixels bigger than others; `CavernDuel$Screen` set to `Fill`
+  makes it as big as fits anyway), with the game's
   palette in the colour table it is shown with; fades show it darker. The
   game's sprites and coordinates are unchanged. Setting `CavernDuel$Screen`
   to `MODE12` changes to MODE 12 instead, with screen banks (OS_Byte 112/113)

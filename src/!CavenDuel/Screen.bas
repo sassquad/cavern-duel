@@ -1,21 +1,22 @@
 1 REM >Screen
 2 REM Cavern Duel's screen, loaded by Game with LIBRARY
 3 REM The game is drawn as MODE 12: 1280x1024 graphics units, 640x256 pixels, 16 colours. It draws into a sprite in that mode,
-4 REM which is shown scaled to fit in the middle of the screen, in whatever mode the desktop is in.
+4 REM which is shown scaled up in the middle of the screen, in whatever mode the desktop is in.
 5 REM The game's palette goes into the colour table the sprite is shown with, so the screen's own palette never changes, and a fade shows the sprite darker.
 6 REM The game changes to MODE 12 itself, with two screen banks and the palette set there, as it always did:
 7 REM if CavernDuel$Screen is MODE12, before RISC OS 3.5, or if the screen is too slow to show the sprite quickly.
-8 :
+8 REM The sprite is shown at a whole multiple of its pixels, as RISC OS scales by repeating pixels: other sizes draw some pixels bigger than others. CavernDuel$Screen set to Fill makes it as big as fits instead
+9 :
 10 DEF PROCscr_init:REM Set up, before anything else, so that errors can be shown. The screen stays as the desktop left it until PROCscr_open
 11 LOCAL i%
 12 DIM scr_pal% 63,scr_dim% 63,scr_tab% 1023,scr_scale% 15,scr_sel% 255
-13 scr_direct%=TRUE:scr_level%=16:scr_tabok%=FALSE:scr_last%=0:scr_s1%=1:scr_s2%=2
+13 scr_direct%=TRUE:scr_level%=16:scr_tabok%=FALSE:scr_last%=0:scr_s1%=1:scr_s2%=2:scr_fill%=FALSE
 14 FOR i%=0 TO 60 STEP 4:scr_pal%!i%=0:NEXT
 15 ENDPROC
 16 :
 17 DEF PROCscr_open:REM Choose how to show the game, and start drawing
 18 LOCAL f%,m%,v$
-19 v$=FNscr_var("CavernDuel$Screen")
+19 v$=FNscr_var("CavernDuel$Screen"):scr_fill%=(v$="FILL" OR v$="Fill" OR v$="fill"):REM Fill: as big as fits, though pixels then differ in size
 20 IF v$<>"MODE12" AND v$<>"Mode12" AND v$<>"mode12" THEN SYS &20065,1 TO ,m%;f%:IF (f% AND 1)=0 THEN PROCscr_sprite(m%):REM XOS_ScreenMode 1 reads the mode; it is missing before RISC OS 3.5
 21 IF scr_direct% THEN MODE 128+12:MODE 12
 22 ENDPROC
@@ -40,16 +41,16 @@
 44 scr_sel%!i%=-1:scr_mode%=scr_sel%
 45 ENDPROC
 46 :
-50 DEF PROCscr_measure:REM Where the game goes on the screen: as big as fits, in the middle, in graphics units
-51 LOCAL xe%,ye%,xp%,yp%,w%,h%
+50 DEF PROCscr_measure:REM Where the game goes on the screen, in graphics units. Normally the largest whole multiple of its pixels that fits, shaped from 5:4 to 10:7, so every pixel is drawn the same size; with Fill, or if none fits, as big as fits
+51 LOCAL xe%,ye%,xp%,yp%,w%,h%,kx%,ky%,a%,b%,c%
 52 SYS "OS_ReadModeVariable",-1,4 TO ,,xe%:SYS "OS_ReadModeVariable",-1,5 TO ,,ye%:SYS "OS_ReadModeVariable",-1,11 TO ,,xp%:SYS "OS_ReadModeVariable",-1,12 TO ,,yp%
-53 w%=(xp%+1)<<xe%:h%=(yp%+1)<<ye%
-54 IF w%*1024<h%*1280 THEN scr_w%=w%:scr_h%=w%*1024 DIV 1280 ELSE scr_h%=h%:scr_w%=h%*1280 DIV 1024
-55 scr_w%=(scr_w%>>xe%)<<xe%:scr_h%=(scr_h%>>ye%)<<ye%
-56 scr_x%=(((w%-scr_w%) DIV 2)>>xe%)<<xe%:scr_y%=(((h%-scr_h%) DIV 2)>>ye%)<<ye%
-57 scr_scale%!0=scr_w%>>xe%:scr_scale%!4=scr_h%>>ye%:scr_scale%!8=640:scr_scale%!12=256:REM x then y multipliers, then x and y divisors, in pixels
-58 ENDPROC
-59 :
+53 w%=(xp%+1)<<xe%:h%=(yp%+1)<<ye%:a%=0
+54 FOR kx%=1 TO 16:FOR ky%=1 TO 32:b%=(640*kx%)<<xe%:c%=(256*ky%)<<ye%:IF NOT scr_fill% AND 640*kx%<=xp%+1 AND 256*ky%<=yp%+1 AND 4*b%>=5*c% AND 7*b%<=10*c% AND kx%*ky%>a% THEN a%=kx%*ky%:scr_w%=b%:scr_h%=c%
+55 NEXT:NEXT
+56 IF a%=0 THEN scr_w%=w%:scr_h%=w%*1024 DIV 1280:IF scr_h%>h% THEN scr_h%=h%:scr_w%=h%*1280 DIV 1024
+57 scr_w%=(scr_w%>>xe%)<<xe%:scr_h%=(scr_h%>>ye%)<<ye%:scr_x%=(((w%-scr_w%) DIV 2)>>xe%)<<xe%:scr_y%=(((h%-scr_h%) DIV 2)>>ye%)<<ye%
+58 scr_scale%!0=scr_w%>>xe%:scr_scale%!4=scr_h%>>ye%:scr_scale%!8=640:scr_scale%!12=256:REM x then y multipliers, then x and y divisors, in pixels
+59 ENDPROC
 60 DEF PROCscr_show:REM Put the picture on the screen
 61 IF scr_direct% THEN ENDPROC
 62 SYS "OS_SpriteOp",scr_r0%,scr_r1%,scr_r2%,scr_r3%
