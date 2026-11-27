@@ -118,19 +118,22 @@ stick, or mount a Mac or Windows file share on the Pi with LanMan98.
 
 ## Porting notes
 
-The code is already 32-bit safe: the only assembler (the palette fader in
-`PROCinitfader`) returns with `LDMFD …,PC`, and the sound modules in
-`Sounds/` (Voice Generator 2.05) are flagged 32-bit compatible. Remaining
-work for modern RISC OS 5 machines:
+The code is 32-bit safe and has no ARM assembler, and the sound modules in
+`Sounds/` (Voice Generator 2.05) are flagged 32-bit compatible.
 
-- **Screen mode.** The game uses MODE 12 (16 colours, 640×256), palette
-  fades via OS_Word 11/12 and screen banks via OS_Byte 112/113. Low-colour
-  rectangular-pixel modes may not be available on newer hardware such as the
-  Raspberry Pi; moving to a 256-colour mode string is the likely fix.
+- **Screen mode.** The game is drawn as MODE 12 (16 colours, 640×256), but
+  doesn't change to it. `Screen` draws it into a MODE 12 sprite and shows that
+  in the middle of the desktop's own mode, at the largest whole multiple of its
+  pixels that fits (RISC OS scales sprites by repeating pixels, so any other
+  size draws some pixels bigger than others; `CavernDuel$Screen` set to `Fill`
+  makes it as big as fits anyway), with the game's
+  palette in the colour table it is shown with; fades show it darker. The
+  game's sprites and coordinates are unchanged. Setting `CavernDuel$Screen`
+  to `MODE12` changes to MODE 12 instead, with screen banks (OS_Byte 112/113)
+  and the palette set there, as it always did; so does RISC OS before 3.5, or a
+  screen too slow to show the sprite in half a frame.
 - **Timing.** Frames start every 5 centiseconds by `TIME` (`Game` line 646),
   so speed only varies on a machine too slow to draw a frame in that time.
 - **Dr Wimp.** Both apps use Dr Wimp 5.04, the latest release. The
   launcher moved from 4.70 with one change; `!CavernEd`, which had its own
   1995 desktop code, was rewritten onto Dr Wimp.
-- **Future 64-bit RISC OS.** Rewriting the fader in BASIC would remove the
-  only ARM assembler.

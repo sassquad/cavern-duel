@@ -7,7 +7,7 @@ Set Alias$@LoadType_022 Run <CavenDuel$Dir>.!Run %%*0
 
 WimpSlot -max 16K -min 16K
 WimpSlot -max 560K -min 560K
-WimpSlot -max 480K -min 480K
+WimpSlot -max 600K -min 600K
 
 | Sound bit
 Tuning 0
